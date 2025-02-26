@@ -1,53 +1,55 @@
 // BrandSelectionScreen.tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import axios from 'axios';
+import Toast from 'react-native-toast-message';
+import { Brand } from "@/app/interface/BrandSelectionScreen";
+import { SelectedOrders } from "@/app/interface/Orders";
+import { BrandsData } from "@/app/constants/DummyData";
 import SKUModal from './SKUModal';
-
-type Brand = {
-  id: string;
-  name: string;
-  skus: string[];
-};
-
-const brands: Brand[] = [
-  { "id": "1", "name": "Johnnie Walker", "skus": ["250ml", "500ml", "750ml"] },
-  { "id": "2", "name": "Smirnoff", "skus": ["250ml", "750ml"] },
-  { "id": "3", "name": "Baileys", "skus": ["500ml", "750ml"] },
-  { "id": "4", "name": "Tanqueray", "skus": ["250ml", "500ml"] },
-  { "id": "5", "name": "Guinness", "skus": ["500ml"] },
-  { "id": "6", "name": "Captain Morgan", "skus": ["250ml", "500ml", "750ml"] },
-  { "id": "7", "name": "Don Julio", "skus": ["750ml"] },
-  { "id": "8", "name": "Cîroc", "skus": ["250ml", "500ml"] },
-  { "id": "9", "name": "Ketel One", "skus": ["500ml", "750ml"] },
-  { "id": "10", "name": "Buchanan's", "skus": ["250ml", "750ml"] },
-  { "id": "11", "name": "Crown Royal", "skus": ["250ml", "500ml"] },
-  { "id": "12", "name": "Bulldog Gin", "skus": ["500ml"] },
-  { "id": "13", "name": "Zacapa", "skus": ["750ml"] },
-  { "id": "14", "name": "Roe & Co", "skus": ["250ml", "500ml", "750ml"] },
-  { "id": "15", "name": "Haig Club", "skus": ["500ml"] },
-  { "id": "16", "name": "Singleton", "skus": ["250ml", "750ml"] },
-  { "id": "17", "name": "Talisker", "skus": ["500ml", "750ml"] },
-  { "id": "18", "name": "Lagavulin", "skus": ["250ml"] },
-  { "id": "19", "name": "Oban", "skus": ["500ml", "750ml"] },
-  { "id": "20", "name": "Clynelish", "skus": ["250ml", "500ml"] }
-];
+import ReviewOrderModal from '@/app/components/ReviewOrderModal';
 
 const BrandSelectionScreen: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modalVisibility, setModalVisibility] = useState(false);
+  const [reviewOrderModalVisibility, setReviewOrderModalVisibility] = useState(false);
+  const [ordersList, setOrdersList] = useState<SelectedOrders>({});
+
+  const handleOrdersUpdate = (brandId: string, updatedSkus: SelectedOrders) => {
+    console.log("brands selction screen, data passed as below");
+    console.log("brandId => ",brandId,"\Updated datd -> ", updatedSkus);
+
+    if(Object.keys(ordersList).length === 0){
+      setOrdersList({[brandId] : updatedSkus});
+    }else{
+      setOrdersList((prevOrders) => {
+        console.log("prevOrders\t",prevOrders);
+        let updatedOrders = { ...prevOrders };
+        console.log(updatedOrders[brandId]);
+        updatedOrders[brandId] = updatedSkus
+        return updatedOrders;
+      });
+    }
+  };
+
+  const clearOrdersList = () => {
+    setOrdersList({});
+  }
 
   // testing code start
   useEffect(() => {
-    setModalVisibility(true);
-    setSelectedBrand(brands[16]);
-  }, []);
+    console.log("BrandSelectionScreen useEffect ordersList\t",ordersList);
+    Toast.show({
+      type: 'success',
+      text1: 'Hello',
+      text2: 'This is some something 👋'
+    });
+  }, [ordersList]);
   // testing code end
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={brands}
+        data={BrandsData}
         keyExtractor={(item) => item.id}
         numColumns={2}
         renderItem={({ item }) => (
@@ -63,12 +65,29 @@ const BrandSelectionScreen: React.FC = () => {
           </TouchableOpacity>
         )}
       />
+      {Object.keys(ordersList).length > 0 ?
+        <TouchableOpacity 
+          style={styles.bottomComponent}
+          onPress={()=>{setReviewOrderModalVisibility(true)}}
+          activeOpacity={0.8} // Adjust opacity on press (optional)
+        >
+          <Text>Review Order</Text>
+        </TouchableOpacity>
+        :<></>
+      }
       { modalVisibility && selectedBrand ?
         <SKUModal
           selectedBrand={selectedBrand}
-          setSelectedBrand={setSelectedBrand}
+          skuList={ordersList[selectedBrand?.id] || {}}
+          // skuList={ Object.keys(ordersList).length == 0 ? {} : ordersList.selectedBrand.sku }
           setModalVisibility={setModalVisibility}
+          setSelectedBrand={setSelectedBrand}
+          handleOrdersUpdate={handleOrdersUpdate}
         /> :
+        <></>
+      }
+      { reviewOrderModalVisibility ?
+        <ReviewOrderModal ordersList={ordersList} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility}/> :
         <></>
       }
     </View>
@@ -86,9 +105,21 @@ const styles = StyleSheet.create({
     margin : 2,
     borderBottomColor: '#ccc',
   },
+  selectedItem: {
+    backgroundColor: '#e0f2f7', // Highlight selected items
+  },
   brandName: {
     color:"#ffffff",
     fontSize: 18,
+  },
+  bottomComponent: {
+    position: 'absolute',
+    bottom: 0, // Sticks to the bottom
+    left: 0,
+    right: 0, // Stretches to the full width
+    backgroundColor: 'lightblue', // Example styling
+    padding: 10,
+    alignItems: 'center'
   }
 });
 

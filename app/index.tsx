@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { View } from "react-native";
 import LoginForm from './LoginForm';
 import BrandSelectionScreen from './components/BrandSelectionScreen';
-import { useState } from "react";
 
 export default function Index() {
   const [loginStatus, setLoginStatus] = useState<boolean>(true);

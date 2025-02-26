@@ -1,81 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert } from 'react-native';
-// import CheckBox from '@react-native-community/checkbox';
 import { Checkbox } from 'react-native-paper';
-import axios from 'axios';
-
-type Brand = {
-  id:string,
-  name : string,
-  skus: string[]
-};
+import { Dropdown } from 'react-native-element-dropdown';
+import { Brand } from "@/app/interface/BrandSelectionScreen";
+import { SelectedOrders } from "@/app/interface/Orders";
+import { DropdownData } from "@/app/constants/DummyData";
 
 type SKUModalProps = {
-    selectedBrand: Brand;
-    setModalVisibility: (newValue: boolean) => void;
-    setSelectedBrand : ( newValue : null ) => void;
+  selectedBrand: Brand;
+  skuList : SelectedOrders | {};
+  setModalVisibility : (newValue: boolean) => void;
+  setSelectedBrand : ( newValue : null ) => void;
+  handleOrdersUpdate : ( brandId: string, updatedSkus : SelectedOrders ) => void;
 };
 
-// Define the type for the selected SKU data
-interface SelectedSkuData {
-  checked: boolean;
-  type?: 'CASES' | 'BOTTLES';
-  quantity?: string;
-}
+const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, skuList, setModalVisibility, setSelectedBrand, handleOrdersUpdate}) => {
+  console.log("SKUModal init skuList\t",skuList);
+  const [selectedSkus, setSelectedSkus] = useState<SelectedOrders>(skuList);
 
-// Define the type for the selectedSkus state
-interface SelectedSkus {
-  [key: string]: SelectedSkuData;
-}
+  useEffect(() => {
+    console.log("useEffect selectedSkus -> ",selectedSkus);
+  },[selectedSkus]);
 
+  const handleCheckboxChange = (sku:string, checkBoxValue:boolean) => {
+    console.log("checkbox value changed");
+    setSelectedSkus((prev) => ({
+      ...prev,
+      [sku]: {
+        checked: checkBoxValue,
+        type: '0',
+        quantity : '1'
+      },
+    }));
+    // if(checkBoxValue){
+    //   setSelectedSkus((prev) => ({
+    //     ...prev,
+    //     [sku]: {
+    //       checked: checkBoxValue,
+    //       type: '0',
+    //       quantity : '1'
+    //     },
+    //   }));
+    // }else{
+    //   setSelectedSkus((prev) => ({
+    //     ...prev,
+    //     [sku]: {
+    //       checked: checkBoxValue
+    //     },
+    //   }));
+    // }
+  };
 
-const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, setModalVisibility, setSelectedBrand}) => {
-  const [quantity, setQuantity] = useState<string>('');
-  const [selectedSkus, setSelectedSkus] = useState<SelectedSkus>({});
-
-  // Function to handle checkbox selection
-  const handleCheckboxChange = (sku:string, value:boolean) => {
+  const handleDropdownChange = (sku:string, skuType:string| undefined) => {
+    console.log("selectedSkus inside dropdown change", selectedSkus);
+    console.log(sku, skuType);
     setSelectedSkus((prev) => ({
       ...prev,
       [sku]: {
         ...prev[sku],
-        checked: value, // Update checkbox state
+        type:skuType
+      },
+    }));
+    
+    // setSelectedSkus((prev) => {
+    //   let updatedOrder = prev;
+    //   // updatedOrder[sku].type = skuType;
+    //   return updatedOrder;
+    // });
+  };
+
+  const handleSetQuantityChange = (sku:string, quantityValue:string) => {
+    setSelectedSkus((prev) => ({
+      ...prev,
+      [sku]: {
+        ...prev[sku],
+        quantity:quantityValue
       },
     }));
   };
 
-   // Function to handle quantity input
-  //  const handleQuantityChange = (sku, value) => {
-  //   setSelectedSkus((prev) => ({
-  //     ...prev,
-  //     [sku]: {
-  //       ...prev[sku],
-  //       quantity: value, // Update quantity
-  //     },
-  //   }));
-  // };
-
-
-  const handleSKUSubmit = async () => {
-    if (!quantity) {
-      Alert.alert('Error', 'Please fill in all fields.');
-      return;
-    }
-
-    try {
-      const response = await axios.post('http://192.168.29.197:3000/orders', {
-        brandId: selectedBrand.id,
-        quantity: parseInt(quantity),
-      });
-
-      if (response.status === 200) {
-        Alert.alert('Success', 'Data submitted successfully!');
-        closeModal();
-      }
-    } catch (err) {
-      Alert.alert('Error', 'Failed to submit data. Please try again.');
-      console.error('API Error:', err);
-    }
+  const handleSKUSubmit = () => {
+    console.log("selectedSkus\t",selectedSkus);
+    console.log("selectedBrand\t",selectedBrand);
+    console.log("skuList\t",skuList);
+    handleOrdersUpdate(selectedBrand.id, selectedSkus);
+    closeModal();
   };
 
   const closeModal = () => {
@@ -101,13 +110,43 @@ const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, setModalVisibility, s
                   />
                   <Text key={skuItem}>{skuItem}</Text>
                 </View>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Quantity"
-                  value={quantity}
-                  onChangeText={setQuantity}
-                  keyboardType="numeric"
-                />
+                <View>
+                  {selectedSkus[skuItem]?.checked?
+                    <Dropdown
+                      // style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+                      // placeholderStyle={styles.placeholderStyle}
+                      // selectedTextStyle={styles.selectedTextStyle}
+                      // inputSearchStyle={styles.inputSearchStyle}
+                      // iconStyle={styles.iconStyle}
+                      data={DropdownData}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      searchPlaceholder="Search..."
+                      value={selectedSkus[skuItem].type}
+                      // onFocus={() => setIsFocus(true)}
+                      // onBlur={() => setIsFocus(false)}
+                      onChange={item => {
+                        handleDropdownChange(skuItem, item.value);
+                        // setValue(item.value);
+                        // setIsFocus(false);
+                    }}
+                  />
+                    : <></>
+                  }
+                </View>
+                <View>
+                  {selectedSkus[skuItem]?.checked?
+                    <TextInput
+                      style={styles.input}
+                      defaultValue={selectedSkus[skuItem].quantity}
+                      // value={selectedSkus[skuItem].quantity}
+                      onChangeText={(value)=>handleSetQuantityChange(skuItem, value)}
+                      keyboardType="numeric"
+                    />
+                    : <></>
+                  }
+                </View>
               </View>
             )
           }
@@ -115,7 +154,7 @@ const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, setModalVisibility, s
               style={styles.submitButton}
               onPress={handleSKUSubmit}
           >
-              <Text style={styles.submitButtonText}>PUNCH-IN</Text>
+              <Text style={styles.submitButtonText}>ADD Items</Text>
           </TouchableOpacity>
           <TouchableOpacity
               style={styles.closeButton}
