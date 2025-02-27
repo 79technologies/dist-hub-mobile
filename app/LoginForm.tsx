@@ -51,7 +51,7 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginChange, showToast}) => {
         showToast();
         setTimeout(() => {
           onLoginChange(true);
-        }, 3000);
+        }, 5000);
       } else {
         setLoading(false);
         setError('Invalid credentials.');

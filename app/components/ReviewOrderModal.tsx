@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faStore, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faShop ,faStore, faCircleXmark, faArrowDown, faArrowRight, faWineBottle, faBox } from '@fortawesome/free-solid-svg-icons';
 import { SelectedOrderData, SelectedOrders } from "@/app/interface/Orders";
 import { BrandsData } from "@/app/constants/DummyData";
 
 type ReviewOrderModal = {
   ordersList : SelectedOrders;
+  outlet : { id: string, label: string };
   clearOrdersList : () => void;
   setReviewOrderModalVisibility : (newValue: boolean) => void;
   handleCancelOrder : () => void;
@@ -18,7 +19,7 @@ type FinalDataObject = {
   skus: { [skuKey: string]: SelectedOrderData };
 }
 
-const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersList, setReviewOrderModalVisibility, handleCancelOrder}) => {
+const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, outlet, clearOrdersList, setReviewOrderModalVisibility, handleCancelOrder}) => {
   const [finalData, setFinalData] = useState<FinalDataObject[]>([]);
   const [orderLoader, setOrderLoader] = useState<boolean>(false);
   
@@ -47,7 +48,7 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersLi
       clearOrdersList();
       closeModal();
       handleCancelOrder();
-    }, 1500);
+    }, 2000);
   };
 
   const closeModal = () => {
@@ -70,7 +71,7 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersLi
             <View key={skuKey} style={styles.skuContainer}>
               {skuDetail.checked && skuDetail.quantity !== '0' && (
                 <Text style={styles.skuText}>
-                  {skuKey} => {skuDetail.quantity} {skuDetail.type === '0' ? 'Cases' : 'Bottles'}
+                  {skuKey} <FontAwesomeIcon icon={faArrowRight} size={15}/> {skuDetail.quantity} {skuDetail.type === '0' ? <FontAwesomeIcon icon={faBox} size={20}/> : <FontAwesomeIcon icon={faWineBottle} size={20}/>}
                 </Text>
               )}
             </View>
@@ -89,7 +90,9 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersLi
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.modalTitleContainer}>
-            <Text style={styles.modalTitle}>Your Order</Text>
+            <Text style={styles.modalTitle}>Confirm Order</Text>
+            <Text style={styles.modalTitle}><FontAwesomeIcon icon={faArrowDown} size={25}/></Text>
+            <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/> {outlet.label}</Text>
           </View>
           <FlatList
             data={finalData}
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
       marginBottom: 4,
   },
   skuText: {
-      fontSize: 14,
+      fontSize: 20,
   },
   modalContainer: {
     flex: 1,

@@ -97,7 +97,7 @@ const BrandSelectionScreen: React.FC = () => {
     <View style={styles.container}>
       {outlet.id == '' ?
       <View style={styles.dropdownContainer}>
-          <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} style={styles.cancelOrderButtonIcons}/></Text>
+          <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons}/></Text>
         <Dropdown
           style={styles.dropdown}
           placeholderStyle={styles.placeholderStyle}
@@ -151,16 +151,21 @@ const BrandSelectionScreen: React.FC = () => {
           )}
         />
         {Object.keys(ordersList).length > 0 ?
-          <TouchableOpacity 
-            style={styles.bottomComponent}
-            onPress={()=>{setReviewOrderModalVisibility(true)}}
-            activeOpacity={0.8} // Adjust opacity on press (optional)
-          >
-            <Text style={styles.bottomComponentText}>Review <FontAwesomeIcon icon={faSearch} size={20} style={styles.cancelOrderButtonIcons}/></Text>
-          </TouchableOpacity> :
-            <TouchableOpacity style={styles.cancelOrderButton} onPress={handleCancelOrder} >
-            <Text style={styles.cancelOrderButtonText}>Cancel <FontAwesomeIcon icon={faBan} size={20} style={styles.cancelOrderButtonIcons}/></Text>
-          </TouchableOpacity>
+          <View style={styles.bottomComponentContainer}>
+            <TouchableOpacity 
+              style={[styles.bottomComponentReview, styles.bottomComponentButton]}
+              onPress={()=>{setReviewOrderModalVisibility(true)}}
+              activeOpacity={0.8} // Adjust opacity on press (optional)
+            >
+              <Text style={styles.bottomComponentText}>Review <FontAwesomeIcon icon={faSearch} size={20} style={styles.buttonIcons}/></Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.bottomComponentCancel,styles.bottomComponentButton]} onPress={handleCancelOrder} >
+              <Text style={styles.bottomComponentText}>Cancel <FontAwesomeIcon icon={faBan} size={20} style={styles.buttonIcons}/></Text>
+            </TouchableOpacity>
+          </View>
+          : <TouchableOpacity style={styles.cancelOrderButton} onPress={handleCancelOrder} >
+              <Text style={styles.bottomComponentText}>Cancel <FontAwesomeIcon icon={faBan} size={20} style={styles.buttonIcons}/></Text>
+            </TouchableOpacity>
         }
         { modalVisibility && selectedBrand ?
           <SKUModal
@@ -177,7 +182,7 @@ const BrandSelectionScreen: React.FC = () => {
           
         {/* </View> */}
         { reviewOrderModalVisibility ?
-          <ReviewOrderModal ordersList={ordersList} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility} handleCancelOrder={handleCancelOrder}/> :
+          <ReviewOrderModal ordersList={ordersList} outlet={outlet} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility} handleCancelOrder={handleCancelOrder}/> :
           <></>
         }
       </>
@@ -274,47 +279,37 @@ const styles = StyleSheet.create({
     fontWeight:'900',
     fontSize: 20,
   },
-  bottomComponent: {
-    backgroundColor: '#FFA209',
+  bottomComponentContainer: {
+    flexDirection: 'row', // Arrange children horizontally
+    justifyContent: 'space-around', // Distribute space between buttons
+    marginTop:10,
+    // padding: 10, // Optional padding
+  },
+  bottomComponentButton : {
     padding: 10,
-    alignItems: 'center'
+    alignItems: 'center',
+    width:'50%'
+  },
+  bottomComponentReview: {
+    backgroundColor: '#FFA209',
+  },
+  bottomComponentCancel: {
+    backgroundColor: '#FF0033',
+  },
+  cancelOrderButton:{
+    height:40,
+    width:'100%',
+    backgroundColor : "#FF0033",
+    alignItems: 'center',
+    borderTopRightRadius:10,
+    borderTopLeftRadius:10,
   },
   bottomComponentText:{
     color : "#ffffff",
     fontSize: 25,
     fontWeight: 'bold',
   },
-  cancelOrderButtonContainer:{
-    // flexDirection: 'row',
-    // justifyContent: 'space-evenly',
-    // flex:1,
-    // alignItems: 'center',
-    // justifyContent:'center',
-    // height:100,
-    // marginTop: 2,
-    // marginBottom: 2,
-  },
-  cancelOrderButton:{
-    height:40,
-    width:'100%',
-    // height:'100%',
-    backgroundColor : "#FF0033",
-    // borderWidth:1,
-    // borderTopLeftRadius:10,
-    // borderTopRightRadius:10,
-    // marginTop: 5,
-    // marginBottom: 2,
-    // width:'90%',
-    // flex:1,
-    alignItems: 'center',
-    // justifyContent:'center',
-  },
-  cancelOrderButtonText:{
-    color : "#ffffff",
-    fontSize: 25,
-    fontWeight: 'bold',
-  },
-  cancelOrderButtonIcons:{
+  buttonIcons:{
     color : "#ffffff",
   }
 });

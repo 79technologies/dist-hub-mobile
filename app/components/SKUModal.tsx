@@ -87,11 +87,11 @@ const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, skuList, setModalVisi
     console.log("selectedBrand\t",selectedBrand);
     console.log("skuList\t",skuList);
     setOrderLoader(true);
-    handleOrdersUpdate(selectedBrand.id, selectedSkus);
     setTimeout(() => {
+      handleOrdersUpdate(selectedBrand.id, selectedSkus);
       setOrderLoader(false);
       closeModal();
-    }, 300);
+    }, 2000);
   };
 
   const closeModal = () => {
