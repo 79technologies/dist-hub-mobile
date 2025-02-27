@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
-import { SelectedOrders } from "@/app/interface/Orders";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faStore, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { SelectedOrderData, SelectedOrders } from "@/app/interface/Orders";
+import { BrandsData } from "@/app/constants/DummyData";
 
 type ReviewOrderModal = {
   ordersList : SelectedOrders;
@@ -8,7 +11,32 @@ type ReviewOrderModal = {
   setReviewOrderModalVisibility : (newValue: boolean) => void;
 };
 
+type FinalDataObject = {
+  brandId : string;
+  brandName : string;
+  skus:SelectedOrderData[];
+}
+
 const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersList, setReviewOrderModalVisibility}) => {
+  const [finalData, setFinalData] = useState<FinalDataObject[]>([]);
+  
+  const transformOrdersList = (ordersList : SelectedOrders,) => {
+    return Object.entries(ordersList).map(([brandId, skus]) => {
+      const brand = BrandsData.find((b) => b.id === brandId);
+      const selectedSkus: SelectedOrderData[] = Object.entries(skus).map(([sku, details]) => ({
+          checked: details.checked,
+          type: details.type,
+          quantity: details.quantity,
+      }));
+
+      return {
+          brandId,
+          brandName: brand?.name || 'Unknown Brand',
+          skus: selectedSkus,
+      };
+    });
+};
+
   const handleSKUSubmit = () => {
     clearOrdersList();
     closeModal();
@@ -18,6 +46,29 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersLi
     setReviewOrderModalVisibility(false);
   }
 
+  useEffect(() => {
+    const finalData = transformOrdersList(ordersList);
+    // console.log(finalData);
+    console.log(JSON.stringify(finalData, null, 2));
+    // console.log(Object.keys(finalData["0"].skus["250ml"]));
+    setFinalData(finalData);
+  }, []);
+
+  const renderItem = ({ item }: { item: FinalDataObject }) => {
+    return (
+        <View style={styles.itemContainer}>
+            <Text style={styles.brandName}>{item.brandName}</Text>
+            {item.skus.map((skuDetail, index) => (
+                <View key={index} style={styles.skuContainer}>
+                    <Text style={styles.skuText}>
+                        Checked: {skuDetail.checked ? 'Yes' : 'No'}, Type: {skuDetail.type}, Quantity: {skuDetail.quantity || 'N/A'}
+                    </Text>
+                </View>
+            ))}
+        </View>
+      );
+    };
+
   return (
     <Modal
       animationType="slide"
@@ -26,39 +77,28 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersLi
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Your Order</Text>
-          {/* <FlatList
-            data={ordersList}
-            keyExtractor={(item) => item.}
-            renderItem={({ item: brand }) => (
-              <View style={styles.brandContainer}>
-                <Text style={styles.brandName}>{brand.name}</Text>
-                {Object.keys(brand.skus).map((skuName) => {
-                  const sku = brand.skus[skuName];
-                  return (
-                    <View key={skuName} style={styles.skuContainer}>
-                      <Text style={styles.skuName}>{skuName}</Text>
-                      <Text style={styles.skuDetails}>
-                        Type: {sku.type}, Quantity: {sku.quantity}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            )}
-          /> */}
-          <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleSKUSubmit}
-          >
-              <Text style={styles.submitButtonText}>ADD Items</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={styles.closeButton}
-              onPress={closeModal}
-          >
-              <Text style={styles.closeButtonText}>CANCEL</Text>
-          </TouchableOpacity>
+          <View style={styles.modalTitleContainer}>
+            <Text style={styles.modalTitle}>Your Order</Text>
+          </View>
+          <FlatList
+            data={finalData}
+            keyExtractor={(item) => item.brandId}
+            renderItem={renderItem}
+          />
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+                style={[styles.submitButton, styles.modalButton]}
+                onPress={handleSKUSubmit}
+            >
+                <Text style={styles.buttonText}>Order <FontAwesomeIcon icon={faStore} style={styles.buttonIcons}/></Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.closeButton, styles.modalButton]}
+                onPress={closeModal}
+            >
+                <Text style={styles.buttonText}>Cancel <FontAwesomeIcon icon={faCircleXmark} style={styles.buttonIcons}/></Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -68,7 +108,28 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, clearOrdersLi
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+  },
+  itemContainer: {
+      padding: 16,
+      marginBottom: 16,
+      backgroundColor: '#fff',
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: '#ddd',
+  },
+  brandName: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 8,
+  },
+  skuContainer: {
+      marginLeft: 8,
+      marginBottom: 4,
+  },
+  skuText: {
+      fontSize: 14,
   },
   modalContainer: {
     flex: 1,
@@ -81,6 +142,14 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
+  },
+  modalTitleContainer : {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
   },
   modalTitle: {
     fontSize: 20,
@@ -95,20 +164,33 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     paddingHorizontal: 10,
   },
-  submitButton : {
-    padding : 10,
-    backgroundColor : "green"
+  buttonsContainer:{
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
   },
-  submitButtonText:{
-    color : "#ffffff"
+  modalButton:{
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 50,
+    padding : 10,
+  },
+  buttonText:{
+    color : "#ffffff",
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonIcons:{
+    color : "#ffffff",
+  },
+  submitButton : {
+    backgroundColor : "#00887A"
   },
   closeButton : {
-    padding : 10,
-    backgroundColor : "red"
-  },
-  closeButtonText : {
-    color : "#ffffff"
-  },
+    backgroundColor : "#FF0033"
+  }
 });
 
 export default ReviewOrderModal;

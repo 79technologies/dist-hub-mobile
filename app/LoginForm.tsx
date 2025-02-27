@@ -1,8 +1,6 @@
-// LoginForm.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ActivityIndicator } from 'react-native';
-import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from 'react-native';
+import { LoginData } from '@/app/constants/DummyData';
 
 type Credentials = {
   email: string;
@@ -24,10 +22,14 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginChange}) => {
   const [credentials, setCredentials] = useState<Credentials>({ email: '', password: '' });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
   const handleInputChange = (field: keyof Credentials, value: string) => {
     setCredentials((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const checkCredentials = (email:string, password:string) => {
+    return LoginData.find(user => user.id === email && user.pass === password);
   };
 
   const handleLogin = async () => {
@@ -42,22 +44,32 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginChange}) => {
     setError(null);
 
     try {
-      const response = await axios.post<ApiResponse>('http://192.168.29.197:3000/signIn', {
-        email,
-        password,
-      });
+      const matchedUser = checkCredentials(email,password);
 
-      if (response.data.success) {
-        Alert.alert('Success', 'You have successfully logged in!');
-        onLoginChange(true);
+      if (matchedUser) {
+        setTimeout(() => {
+          onLoginChange(true);
+        }, 3000);
       } else {
-        Alert.alert(response.data.message || 'Invalid credentials.');
-        setError(response.data.message || 'Invalid credentials.');
+        setLoading(false);
+        setError('Invalid credentials.');
       }
+
+      // const response = await axios.post<ApiResponse>('http://192.168.29.197:3000/signIn', {
+      //   email,
+      //   password,
+      // });
+
+      // if (response.data.success) {
+      //   Alert.alert('Success', 'You have successfully logged in!');
+      //   onLoginChange(true);
+      // } else {
+      //   Alert.alert(response.data.message || 'Invalid credentials.');
+      //   setError(response.data.message || 'Invalid credentials.');
+      // }
     } catch (err) {
       setError('An error occurred. Please try again.');
       console.error('API Error:', err);
-    } finally {
       setLoading(false);
     }
   };

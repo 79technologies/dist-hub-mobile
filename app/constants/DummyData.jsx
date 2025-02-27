@@ -1,6 +1,20 @@
+export const LoginData = [
+    { id: 'admin1@diageo.com', pass: '12345' },
+    { id: 'admin2@diageo.com', pass: '09876' },
+];
+
 export const DropdownData = [
     { label: 'Cases', value: '0' },
     { label: 'Bottles', value: '1' },
+];
+
+export const OutletData = [
+    { value: '0', label: 'Outlet 1' },
+    { value: '1', label: 'Outlet 2'},
+    { value: '2', label: 'Outlet 3'},
+    { value: '3', label: 'Outlet 4'},
+    { value: '4', label: 'Outlet 5'},
+    { value: '5', label: 'Outlet 6'},
 ];
 
 export const BrandsData = [
