@@ -7,7 +7,7 @@ import LoginForm from './LoginForm';
 import BrandSelectionScreen from './components/BrandSelectionScreen';
 
 export default function Index() {
-  const [loginStatus, setLoginStatus] = useState<boolean>(true);
+  const [loginStatus, setLoginStatus] = useState<boolean>(false);
 
   const handleLoginStatusChange = (newValue:boolean) => {
     setLoginStatus(newValue);
