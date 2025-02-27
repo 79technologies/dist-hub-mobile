@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faUserTie, faShop, faBan, faSearch } from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-toast-message';
 import { Brand } from "@/app/interface/BrandSelectionScreen";
 import { SelectedOrders } from "@/app/interface/Orders";
@@ -18,6 +18,8 @@ type Outlet = {
 
 const BrandSelectionScreen: React.FC = () => {
   const [outlet, setOutlet] = useState<Outlet>({ id: '', label: '' });
+  const [search, setSearch] = useState('');
+  const [filteredData, setFilteredData] = useState(OutletData);
 
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modalVisibility, setModalVisibility] = useState(false);
@@ -39,6 +41,14 @@ const BrandSelectionScreen: React.FC = () => {
         return updatedOrders;
       });
     }
+  };
+
+  const handleOutletSearch = (text:string) => {
+    setSearch(text);
+    const filtered = OutletData.filter((item) =>
+      item.label.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredData(filtered);
   };
 
   const handleDropdownChange = (outletId:string, outletLabel:string) => {
@@ -86,33 +96,32 @@ const BrandSelectionScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {outlet.id == '' ?
-      <>
+      <View style={styles.dropdownContainer}>
+          <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} style={styles.cancelOrderButtonIcons}/></Text>
         <Dropdown
           style={styles.dropdown}
           placeholderStyle={styles.placeholderStyle}
           inputSearchStyle={styles.inputSearchStyle}
-          data={OutletData}
+          data={filteredData}
+          search
           maxHeight={300}
           labelField="label"
           valueField="value"
           placeholder='Select Outlet...'
-          searchPlaceholder="Search..."
+          searchPlaceholder="Search"
           value={outlet.id}
           onChange={item => {
             handleDropdownChange(item.value, item.label);
           }}
+          onChangeText={handleOutletSearch}
         />
-      </>:
+      </View>:
       <>
         <View style={styles.outletNameContainer}>
-          <Text style={styles.outletName}>{outlet.label}</Text>
-        </View>
-        <View style={styles.cancelOrderButtonContainer}>
-          <TouchableOpacity style={styles.cancelOrderButton} onPress={handleCancelOrder} >
-            <Text style={styles.cancelOrderButtonText}>Cancel <FontAwesomeIcon icon={faCircleXmark} style={styles.cancelOrderButtonIcons}/></Text>
-          </TouchableOpacity>
+          <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{outlet.label}</Text>
         </View>
         <FlatList
+          style={styles.brandContainer}
           data={BrandsData}
           keyExtractor={(item) => item.id}
           numColumns={2}
@@ -147,9 +156,11 @@ const BrandSelectionScreen: React.FC = () => {
             onPress={()=>{setReviewOrderModalVisibility(true)}}
             activeOpacity={0.8} // Adjust opacity on press (optional)
           >
-            <Text>Review Order</Text>
+            <Text style={styles.bottomComponentText}>Review <FontAwesomeIcon icon={faSearch} size={20} style={styles.cancelOrderButtonIcons}/></Text>
+          </TouchableOpacity> :
+            <TouchableOpacity style={styles.cancelOrderButton} onPress={handleCancelOrder} >
+            <Text style={styles.cancelOrderButtonText}>Cancel <FontAwesomeIcon icon={faBan} size={20} style={styles.cancelOrderButtonIcons}/></Text>
           </TouchableOpacity>
-          :<></>
         }
         { modalVisibility && selectedBrand ?
           <SKUModal
@@ -162,8 +173,11 @@ const BrandSelectionScreen: React.FC = () => {
           /> :
           <></>
         }
+        {/* <View style={styles.cancelOrderButtonContainer}> */}
+          
+        {/* </View> */}
         { reviewOrderModalVisibility ?
-          <ReviewOrderModal ordersList={ordersList} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility}/> :
+          <ReviewOrderModal ordersList={ordersList} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility} handleCancelOrder={handleCancelOrder}/> :
           <></>
         }
       </>
@@ -175,10 +189,28 @@ const BrandSelectionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    // padding: 20,
+    justifyContent: 'center',
+    // alignItems: 'center',
+    // maxHeight: '80%', // Limit modal height
+  },
+  dropdownContainer:{
+    flex: 1,
+    // padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // maxHeight: '80%', // Limit modal height
+    backgroundColor : "#3B0B61",
+  },
+  dropdownText:{
+    // marginBottom:100,
+    color:"#FFFFFF",
+    fontSize:25,
+    height:50
   },
   dropdown: {
     height: 50,
+    width:'80%',
     borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
@@ -204,56 +236,83 @@ const styles = StyleSheet.create({
     borderColor: '#D1D5DB', // Light border for search input
   },
   outletNameContainer:{
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    // padding: 20,
+    backgroundColor:"#2C0156",
+    padding: 20,
+    // borderRadius:8,
+    // borderWidth: 1,
+    // borderColor: '#4DA2BA',
+    // borderStyle:'dashed'
   },
   outletName:{
     fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333', // Dark gray
+    // marginBottom: 10,
+    color: '#FFFFFF',
+  },
+  brandContainer:{
+    // flex:1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    padding: 20,
+    maxHeight:'100%',
   },
   brandItem: {
     padding: 15,
-    backgroundColor : "maroon",
+    backgroundColor : "#D9F5E4",
     margin : 2,
-    borderBottomColor: '#ccc',
-  },
-  selectedItem: {
-    backgroundColor: '#e0f2f7', // Highlight selected items
-  },
-  brandName: {
-    color:"#ffffff",
-    fontSize: 18,
   },
   selectedBrandItem: {
-    backgroundColor: 'green', // Change background color for selected brands
-    // borderWidth: 2,
-    // borderColor: '#007bff',
+    backgroundColor: '#65529A', // Change background color for selected brands
+    // borderWidth: 10,
+    // borderColor: 'green',
+  },
+  brandName: {
+    color:"#4DA2BA",
+    fontWeight:'900',
+    fontSize: 20,
   },
   bottomComponent: {
-    backgroundColor: 'lightblue', // Example styling
+    backgroundColor: '#FFA209',
     padding: 10,
     alignItems: 'center'
   },
+  bottomComponentText:{
+    color : "#ffffff",
+    fontSize: 25,
+    fontWeight: 'bold',
+  },
   cancelOrderButtonContainer:{
-    borderColor:'black',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 100,
+    // flexDirection: 'row',
+    // justifyContent: 'space-evenly',
+    // flex:1,
+    // alignItems: 'center',
+    // justifyContent:'center',
+    // height:100,
+    // marginTop: 2,
+    // marginBottom: 2,
   },
   cancelOrderButton:{
-    borderColor:'black',
-    borderRadius: 8,
-    padding : 10,
+    height:40,
+    width:'100%',
+    // height:'100%',
+    backgroundColor : "#FF0033",
+    // borderWidth:1,
+    // borderTopLeftRadius:10,
+    // borderTopRightRadius:10,
+    // marginTop: 5,
+    // marginBottom: 2,
+    // width:'90%',
+    // flex:1,
+    alignItems: 'center',
+    // justifyContent:'center',
   },
   cancelOrderButtonText:{
-    backgroundColor : "#FF0033",
     color : "#ffffff",
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 25,
+    fontWeight: 'bold',
   },
   cancelOrderButtonIcons:{
     color : "#ffffff",

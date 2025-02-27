@@ -91,7 +91,7 @@ const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, skuList, setModalVisi
     setTimeout(() => {
       setOrderLoader(false);
       closeModal();
-    }, 1500);
+    }, 300);
   };
 
   const closeModal = () => {
@@ -211,12 +211,12 @@ const styles = StyleSheet.create({
   },
   skuContainer:{
     padding: 16,
-      marginBottom: 16,
-      borderStyle:'dashed',
-      backgroundColor: 'rgba(250, 233, 244, 0.5)',
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: '#000',
+    marginBottom: 16,
+    borderStyle:'dashed',
+    backgroundColor: 'rgba(250, 233, 244, 0.5)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#000',
   },
   checkboxContainer:{
     flexDirection: 'row',

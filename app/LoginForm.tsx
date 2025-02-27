@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { LoginData } from '@/app/constants/DummyData';
 
 type Credentials = {
@@ -16,9 +16,10 @@ type ApiResponse = {
 // Define the props for LoginForm
 type LoginFormProps = {
   onLoginChange: (newValue: boolean) => void;
+  showToast : () => void;
 };
 
-const LoginForm: React.FC<LoginFormProps> = ({onLoginChange}) => {
+const LoginForm: React.FC<LoginFormProps> = ({onLoginChange, showToast}) => {
   const [credentials, setCredentials] = useState<Credentials>({ email: '', password: '' });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +48,7 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginChange}) => {
       const matchedUser = checkCredentials(email,password);
 
       if (matchedUser) {
+        showToast();
         setTimeout(() => {
           onLoginChange(true);
         }, 3000);
@@ -76,7 +78,10 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginChange}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <View style={styles.ImageContainer}>
+        <Image source={require('@/assets/images/diageo.png')} style={styles.image} />
+      </View>
+      {/* <Text style={styles.title}>Login</Text> */}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -105,19 +110,31 @@ const LoginForm: React.FC<LoginFormProps> = ({onLoginChange}) => {
 
 const styles = StyleSheet.create({
   container: {
+    // backgroundColor : "#D9F5E4",
     flex: 1,
     justifyContent: 'center',
+    // textAlign: 'center',
     padding: 20,
+    // borderWidth: 1, borderColor: 'red',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  ImageContainer:{
+    // flex:1,
     textAlign: 'center',
+    // justifyContent: 'center',
+    // borderWidth: 1, borderColor: 'red',
+  },
+  image: {
+    // borderWidth: 1, borderColor: 'red',
+    width: 'auto',
+    marginBottom:50,
+    // height: 200,
+    // alignItems: 'center',
+    resizeMode: 'contain', // or 'cover', 'stretch', etc.
   },
   input: {
+    color:'#000',
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#000',
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 15,
