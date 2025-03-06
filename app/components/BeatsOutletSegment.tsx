@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faUserTie, faShop, faBan, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { BeatsData } from "@/app/constants/DummyData";
 import { BeatsOutletSegmentInterface } from '../interface/BeatsOutletSegment';
 import CustomDropdown from './CustomDropdown';
+import NewBrandsScreen from './NewBrandsScreen';
 
 const BeatsOutletSegment: React.FC = () => {
     const[beatsDropdownData,setBeatsDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
@@ -80,57 +83,89 @@ const BeatsOutletSegment: React.FC = () => {
 
     }, [segmentDropdownData]);
   return (
-    <View style={styles.container}>
-        {beatsDropdownData.length>0 ? (
-            <>
-                <CustomDropdown
-                    setSelectedDropdownProps={setSelectedBeat}
-                    dropdownData={beatsDropdownData}
-                    dropdownType="Beat"
-                />
-                {outletDropdownData.length>0?
-                    <CustomDropdown
-                        setSelectedDropdownProps={setSelectedOutlet}
-                        dropdownData={outletDropdownData}
-                        dropdownType="Outlet"
-                    />
-                    :<></>
-                }
-                {segmentDropdownData.length>0?
-                    <CustomDropdown
-                        setSelectedDropdownProps={setSelectedSegment}
-                        dropdownData={segmentDropdownData}
-                        dropdownType="Segment"
-                    />
-                    :<></>
-                }
-                {selectedBeat !== '' && selectedOutlet !== ''  && selectedSegment !== '' ?
+    <>
+        {selectedBeat !== '' && selectedOutlet !== ''  && selectedSegment !== '' ?
+            <NewBrandsScreen
+                selectedBeat={selectedBeat}
+                selectedOutlet={selectedOutlet}
+                selectedSegment={selectedSegment}
+                setSelectedBeat={setSelectedBeat}
+            />
+            :<>
+                {beatsDropdownData.length>0 ? (
+                    <View style={styles.container}>
+                        <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons}/></Text>
+                        <View style={styles.dropdownContainerActive}>
+                            <CustomDropdown
+                                setSelectedDropdownProps={setSelectedBeat}
+                                dropdownData={beatsDropdownData}
+                                dropdownType="Beat"
+                            />
+                        </View>
+                        {outletDropdownData.length>0?
+                            <View style={styles.dropdownContainerActive}>
+                                <CustomDropdown
+                                    setSelectedDropdownProps={setSelectedOutlet}
+                                    dropdownData={outletDropdownData}
+                                    dropdownType="Outlet"
+                                />
+                            </View>
+                            :<></>
+                        }
+                        {segmentDropdownData.length>0?
+                            <View style={styles.dropdownContainerActive}>
+                                <CustomDropdown
+                                    setSelectedDropdownProps={setSelectedSegment}
+                                    dropdownData={segmentDropdownData}
+                                    dropdownType="Segment"
+                                />
+                            </View>
+                            :<></>
+                        }
+                        {segmentDropdownData.length>0?
+                            <Text style={styles.segmentText}>Selecting Segment will redirect to brands Screen.</Text>
+                            :<></>
+                        }
+                    </View>
+                ) : (
                     <>
-                        <Text>GTG</Text>
+                        <ActivityIndicator size="large" color="#0000ff" />
+                        <Text style={styles.loadingText}>Fetching Beats Data</Text>
                     </>
-                    :<></>
-                }
+                )}
             </>
-        ) : (
-            <>
-                <ActivityIndicator size="large" color="#0000ff" />
-                <Text style={styles.loadingText}>Fetching Beats Data</Text>
-            </>
-        )}
-                {/* <Text style={styles.loadingText}>Fetching Beats Data</Text> */}
-
-    </View>
+        }
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    // maxHeight: '80%', // Limit modal height
     backgroundColor : "#3B0B61",
+  },
+  dropdownContainerActive : {
+    width : '100%',
+    height:200,
+    // position:'relative',
+    // top:100
+  },
+  segmentText:{
+    color : "#ffffff",
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  dropdownText:{
+    // marginBottom:100,
+    color:"#FFFFFF",
+    fontSize:25,
+    height:50
+  },
+  buttonIcons:{
+    color : "#ffffff",
   },
   loadingText : {
     color : "#ffffff"

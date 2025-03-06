@@ -50,7 +50,7 @@ const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownTy
 
     return (
         <View style={styles.dropdownContainer}>
-            <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons}/></Text>
+            {/* <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons}/></Text> */}
             <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
     dropdownContainer:{
         flex: 1,
         padding: 20,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
         // maxHeight: '80%', // Limit modal height
-        borderColor:'red',
-        borderWidth:2,
+        // borderColor:'red',
+        // borderWidth:2,
         width:"100%"
       },
       dropdownText:{

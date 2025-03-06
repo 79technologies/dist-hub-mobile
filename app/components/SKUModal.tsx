@@ -91,7 +91,7 @@ const SKUModal: React.FC<SKUModalProps> = ({selectedBrand, skuList, setModalVisi
       handleOrdersUpdate(selectedBrand.id, selectedSkus);
       setOrderLoader(false);
       closeModal();
-    }, 2000);
+    }, 800);
   };
 
   const closeModal = () => {
