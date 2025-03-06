@@ -8,7 +8,7 @@ import BrandSelectionScreen from './components/BrandSelectionScreen';
 import BeatsOutletSegment from './components/BeatsOutletSegment';
 
 export default function Index() {
-  const [loginStatus, setLoginStatus] = useState<boolean>(false);
+  const [loginStatus, setLoginStatus] = useState<boolean>(true);
 
   const handleLoginStatusChange = (newValue:boolean) => {
     setLoginStatus(newValue);

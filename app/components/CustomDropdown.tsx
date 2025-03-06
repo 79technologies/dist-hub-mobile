@@ -8,7 +8,7 @@ import { BeatsOutletSegmentInterface, Beats, Outlet, Segment } from '../interfac
 type CustomDropdownProps = {
     dropdownData : BeatsOutletSegmentInterface[];
     dropdownType : string;
-    setSelectedDropdownProps : (newValue : string) => void;
+    setSelectedDropdownProps : (newValue : BeatsOutletSegmentInterface | null) => void;
 };
 
 const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownType, setSelectedDropdownProps }) => {
@@ -17,12 +17,13 @@ const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownTy
     const [filteredData, setFilteredData] = useState<string[]|[]>([]);
 
     const handleDropdownChange = (outletId:string, outletLabel:string) => {
-        setSelectedDropdownData({
-            id : outletId,
-            name : outletLabel
-        });
-        setSelectedDropdownProps(outletId);
-        console.log(outletId, outletLabel);
+      const finalData = {
+        id : outletId,
+        name : outletLabel
+      };
+        setSelectedDropdownData(finalData);
+        setSelectedDropdownProps(finalData);
+        // console.log(outletId, outletLabel);
     }
 
     const handleOutletSearch = (text:string) => {

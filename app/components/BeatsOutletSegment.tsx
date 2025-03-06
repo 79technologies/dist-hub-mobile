@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserTie, faShop, faBan, faSearch } from '@fortawesome/free-solid-svg-icons';
-import { BeatsData } from "@/app/constants/DummyData";
+import { BeatsOutletData } from "@/app/constants/BeatsOutlet";
 import { BeatsOutletSegmentInterface } from '../interface/BeatsOutletSegment';
+import { Brand } from "@/app/interface/BrandSelectionScreen";
+import { SegmentBrandData } from "@/app/constants/SegmentBrand";
 import CustomDropdown from './CustomDropdown';
 import NewBrandsScreen from './NewBrandsScreen';
 
@@ -11,86 +13,72 @@ const BeatsOutletSegment: React.FC = () => {
     const[beatsDropdownData,setBeatsDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
     const[outletDropdownData,setOutletDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
     const[segmentDropdownData,setSegmentDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
+    const[brandsData, setBrandsData]=useState<Brand[]>([]);
 
-    const[selectedBeat,setSelectedBeat] = useState<string>('');
-    const[selectedOutlet,setSelectedOutlet] = useState<string>('');
-    const[selectedSegment,setSelectedSegment] = useState<string>('');
-
-    const getBeatsDropdownData = () => {
-        return BeatsData.map((beat) => ({
-            id: beat.beatId,
-            name: beat.beatName,
-        }));
-    }
+    const[selectedBeat,setSelectedBeat] = useState<BeatsOutletSegmentInterface|null>(null);
+    const[selectedOutlet,setSelectedOutlet] = useState<BeatsOutletSegmentInterface|null>(null);
+    const[selectedSegment,setSelectedSegment] = useState<BeatsOutletSegmentInterface|null>(null);
 
     // set initial dropdown data
     useEffect(() => {
         setTimeout(() => {
-            const beatsDropdownData = getBeatsDropdownData();
+            const beatsDropdownData = BeatsOutletData.map((beat) => ({
+                id: beat.beatId,
+                name: beat.beatName,
+            }));
+            const segmentsDropdownData = SegmentBrandData.map((segment) => ({
+                id: segment.segmentId,
+                name: segment.segmentName,
+            }));
             setBeatsDropdownData(beatsDropdownData);
+            setSegmentDropdownData(segmentsDropdownData);
           }, 1500);
     }, []);
 
     // if selectedBeat changes
     useEffect(() => {
         // set appropriate outletDropdownData and selectedOutlet
-        const foundBeat = BeatsData.find((beat) => beat.beatId === selectedBeat);
+        const foundBeat = BeatsOutletData.find((beat) => beat.beatId === selectedBeat?.id);
       
         if (!foundBeat) {
             console.log(`Beat with ID '${selectedBeat}' not found.`);
             setOutletDropdownData([]);
-            setSelectedOutlet('');
         }else{
             const finalOutletDropdownData = foundBeat.outlets.map((outlet) => ({
                 id: outlet.outletId,
                 name: outlet.outletName,
             }));
             setOutletDropdownData(finalOutletDropdownData);
-            setSelectedOutlet('');
         }
-
-        // reset segmentDropdownData & selectedSegment
-        setSegmentDropdownData([]);
-        setSelectedSegment('');
+        setSelectedOutlet(null);
+        setBrandsData([]);
     }, [selectedBeat]);
 
-    // if selectedOutlet changes
+    // set brands data after segment has been selected
     useEffect(() => {
-        // set appropriate segmentDropdownData
-        const foundBeat : any = BeatsData.find((beat) => beat.beatId === selectedBeat);
-        if (!foundBeat) {
-            console.log("Beat not found.");
-        }else{
-            const foundOutlet : any = foundBeat.outlets.find((outlet) => outlet.outletId === selectedOutlet);
-            console.log("foundOutlet/t",foundOutlet);
-            if (!foundOutlet) {
-                console.log("Outlet not found in the specified beat.");
+        console.log("brandsData\t",brandsData);
+        if(selectedSegment){
+            const finalBrandsData = SegmentBrandData.find((segmentData) => segmentData.segmentId === selectedSegment.id);
+            if (!finalBrandsData) {
+                console.log(`Segment with ID '${selectedSegment}' not found.`);
             }else{
-                const finalSegmentDropdownData : any = foundOutlet.segments.map((segment:any) => ({
-                    id: segment.segmentId,
-                    name: segment.segmentName,
-                }));
-                console.log("finalSegmentDropdownData\t",finalSegmentDropdownData);
-                setSegmentDropdownData(finalSegmentDropdownData);
-                setSelectedSegment('');
+                setBrandsData(finalBrandsData.brands);
             }
         }
-
-    }, [selectedOutlet]);
-
-    // set segment dropdown data after outlet has been selected
-    useEffect(() => {
-
-    }, [segmentDropdownData]);
+    }, [selectedSegment]);
   return (
     <>
-        {selectedBeat !== '' && selectedOutlet !== ''  && selectedSegment !== '' ?
-            <NewBrandsScreen
-                selectedBeat={selectedBeat}
-                selectedOutlet={selectedOutlet}
-                selectedSegment={selectedSegment}
-                setSelectedBeat={setSelectedBeat}
-            />
+        {brandsData.length>0 ?
+            <>
+            {/* <Text>okay</Text> */}
+                <NewBrandsScreen
+                    selectedBeat={selectedBeat}
+                    selectedOutlet={selectedOutlet}
+                    selectedSegment={selectedSegment}
+                    brandsData={brandsData}
+                    setSelectedBeat={setSelectedBeat}
+                />
+            </>
             :<>
                 {beatsDropdownData.length>0 ? (
                     <View style={styles.container}>
@@ -112,7 +100,7 @@ const BeatsOutletSegment: React.FC = () => {
                             </View>
                             :<></>
                         }
-                        {segmentDropdownData.length>0?
+                        {selectedOutlet?
                             <View style={styles.dropdownContainerActive}>
                                 <CustomDropdown
                                     setSelectedDropdownProps={setSelectedSegment}
@@ -122,7 +110,7 @@ const BeatsOutletSegment: React.FC = () => {
                             </View>
                             :<></>
                         }
-                        {segmentDropdownData.length>0?
+                        {selectedOutlet?
                             <Text style={styles.segmentText}>Selecting Segment will redirect to brands Screen.</Text>
                             :<></>
                         }

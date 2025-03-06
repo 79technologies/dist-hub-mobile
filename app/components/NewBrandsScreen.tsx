@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserTie, faShop, faBan, faSearch } from '@fortawesome/free-solid-svg-icons';
 import Toast from 'react-native-toast-message';
 import { Brand } from "@/app/interface/BrandSelectionScreen";
+import { BeatsOutletSegmentInterface } from '../interface/BeatsOutletSegment';
 import { SelectedOrders } from "@/app/interface/Orders";
 import { BrandsData, OutletData } from "@/app/constants/DummyData";
 import SKUModal from './SKUModal';
@@ -16,14 +17,15 @@ type Outlet = {
 };
 
 type NewBrandsScreenProps = {
-    selectedBeat : string;
-    selectedOutlet : string;
-    selectedSegment : string;
-    setSelectedBeat : (newValue: string) => void;
+    selectedBeat : BeatsOutletSegmentInterface | null;
+    selectedOutlet : BeatsOutletSegmentInterface | null;
+    selectedSegment : BeatsOutletSegmentInterface | null;
+    brandsData : Brand[];
+    setSelectedBeat : (newValue: BeatsOutletSegmentInterface | null) => void;
 };
 
-const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selectedOutlet, selectedSegment, setSelectedBeat}) => {
-  const [outlet, setOutlet] = useState<Outlet>({ id: '', label: '' });
+const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selectedOutlet, selectedSegment, brandsData, setSelectedBeat}) => {
+//   const [outlet, setOutlet] = useState<Outlet>({ id: '', label: '' });
 
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modalVisibility, setModalVisibility] = useState(false);
@@ -61,7 +63,7 @@ const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selecte
     // if (!ordersList.hasOwnProperty(brandId)) return false;
     //   const skus = ordersList[brandId];
     //   return Object.values(skus).some((sku:any) => sku.checked === true);
-    setOutlet({ id: '', label: '' });
+    // setOutlet({ id: '', label: '' });
     setSelectedBrand(null);
     setModalVisibility(false);
     setReviewOrderModalVisibility(false);
@@ -85,11 +87,11 @@ const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selecte
   return (
     <View style={styles.container}>
         <View style={styles.outletNameContainer}>
-            <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{selectedSegment}</Text>
+            <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{selectedSegment?.name}</Text>
         </View>
         <FlatList
             style={styles.brandContainer}
-            data={BrandsData}
+            data={brandsData}
             keyExtractor={(item) => item.id}
             numColumns={2}
             renderItem={({ item }) => (isBrandSelected(item.id)?
@@ -110,8 +112,7 @@ const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selecte
                 onPress={() => {
                     setSelectedBrand(item);
                     setModalVisibility(true);
-                    }
-                }
+                }}
             >
                 <Text style={styles.brandName}>{item.name}</Text>
             </TouchableOpacity>
@@ -149,7 +150,7 @@ const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selecte
             
         {/* </View> */}
         { reviewOrderModalVisibility ?
-            <ReviewOrderModal ordersList={ordersList} outlet={outlet} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility} handleCancelOrder={handleCancelOrder}/> :
+            <ReviewOrderModal ordersList={ordersList} outlet={selectedOutlet?.name} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility} handleCancelOrder={handleCancelOrder}/> :
             <></>
         }
     </View>

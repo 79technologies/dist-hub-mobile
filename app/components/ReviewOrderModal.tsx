@@ -7,7 +7,7 @@ import { BrandsData } from "@/app/constants/DummyData";
 
 type ReviewOrderModal = {
   ordersList : SelectedOrders;
-  outlet : { id: string, label: string };
+  outlet : string;
   clearOrdersList : () => void;
   setReviewOrderModalVisibility : (newValue: boolean) => void;
   handleCancelOrder : () => void;
@@ -92,7 +92,7 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, outlet, clear
           <View style={styles.modalTitleContainer}>
             <Text style={styles.modalTitle}>Confirm Order</Text>
             <Text style={styles.modalTitle}><FontAwesomeIcon icon={faArrowDown} size={25}/></Text>
-            <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/> {outlet.label}</Text>
+            <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/> {outlet}</Text>
           </View>
           <FlatList
             data={finalData}
