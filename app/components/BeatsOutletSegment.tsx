@@ -25,10 +25,10 @@ const BeatsOutletSegment: React.FC = () => {
           }, 150);
     }, []);
 
-    useEffect(() => {
-        setSelectedBeat(beatsDropdownData[0]);
-        setSelectedOutlet({"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"});
-    }, [beatsDropdownData]);
+    // useEffect(() => {
+    //     setSelectedBeat(beatsDropdownData[0]);
+    //     setSelectedOutlet({"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"});
+    // }, [beatsDropdownData]);
 
     // if selectedBeat changes
     useEffect(() => {
@@ -56,15 +56,12 @@ const BeatsOutletSegment: React.FC = () => {
 
   return (
     <>
-        {selectedOutlet?
-            <>
-            {/* <Text>okay</Text> */}
-                <NewBrandsScreen
-                    selectedBeat={selectedBeat}
-                    selectedOutlet={selectedOutlet}
-                    handleBrandsCancel={handleBrandsCancel}
-                />
-            </>
+        {selectedOutlet!=null?
+            <NewBrandsScreen
+                selectedBeat={selectedBeat}
+                selectedOutlet={selectedOutlet}
+                handleBrandsCancel={handleBrandsCancel}
+            />
             :<>
                 {beatsDropdownData.length>0 ? (
                     <View style={styles.container}>

@@ -21,8 +21,8 @@ type NewBrandsScreenProps = {
 const newSelectedBeat = {"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"}
 const newSelectedOutlet = {"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"}
 
-// const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selectedOutlet, handleBrandsCancel}) => {
-const NewBrandsScreen : React.FC = () => {
+const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selectedOutlet, handleBrandsCancel}) => {
+// const NewBrandsScreen : React.FC = () => {
 
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modalVisibility, setModalVisibility] = useState(false);
@@ -99,7 +99,7 @@ const NewBrandsScreen : React.FC = () => {
     setModalVisibility(false);
     setReviewOrderModalVisibility(false);
     setOrdersList({});
-    // handleBrandsCancel();
+    handleBrandsCancel();
     console.log("cancel order clicked");
   };
 
@@ -221,10 +221,10 @@ const NewBrandsScreen : React.FC = () => {
   return (
     <View style={styles.container}>
         <View style={styles.outletNameContainer}>
-            <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{newSelectedOutlet?.name}</Text>
+            <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{selectedOutlet?.name}</Text>
         </View>
-        {/* {selectedOutlet? */}
-        {newSelectedOutlet?
+        {selectedOutlet?
+        // {newSelectedOutlet?
           <View style={styles.dropdownContainerActive}>
             <CustomDropdown
               setSelectedDropdownProps={setSelectedSegment}
@@ -296,9 +296,10 @@ const NewBrandsScreen : React.FC = () => {
         {/* </View> */}
         { reviewOrderModalVisibility ?
             <ReviewOrderModal
+              beatName={selectedBeat?.name}
               segmentOrderData={segmentOrderData}
               // outlet={selectedOutlet?.name}
-              outlet={newSelectedOutlet?.name}
+              outlet={selectedOutlet?.name}
               brandsData={brandsData}
               clearOrdersList={clearOrdersList}
               setReviewOrderModalVisibility={setReviewOrderModalVisibility}

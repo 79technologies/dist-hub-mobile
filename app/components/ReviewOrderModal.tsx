@@ -8,6 +8,7 @@ import { Brand } from '../interface/BrandSelectionScreen';
 
 type ReviewOrderModal = {
   outlet : string;
+  beatName : string;
   segmentOrderData : SegmentOrder[];
   brandsData : Brand[];
   clearOrdersList : () => void;
@@ -25,30 +26,12 @@ type FinalDataObject = {
   };
 }
 
-const ReviewOrderModal: React.FC<ReviewOrderModal> = ({outlet, segmentOrderData, brandsData, clearOrdersList, setReviewOrderModalVisibility, handleCancelOrder}) => {
+const ReviewOrderModal: React.FC<ReviewOrderModal> = ({beatName, outlet, segmentOrderData, brandsData, clearOrdersList, setReviewOrderModalVisibility, handleCancelOrder}) => {
   // const [finalData, setFinalData] = useState<SegmentOrder[]>(segmentOrderData);
   const [finalData, setFinalData] = useState<FinalDataObject[]>([]);
   const [orderLoader, setOrderLoader] = useState<boolean>(false);
 
   const transformOrdersList = (ordersList: SegmentOrder[]) => {
-    // return ordersList.flatMap(segment => {
-    //   return Object.entries(segment.segmentOrders).map(([brandId, skus]) => {
-    //       const brand = brandsData.find((b) => b.id === brandId);
-    //       const skusObject: { [skuKey: string]: SelectedOrderData } = {};
-
-    //       Object.entries(skus).forEach(([skuKey, skuDetail]) => {
-    //           skusObject[skuKey] = skuDetail;
-    //       });
-
-    //       return {
-    //           segmentId: segment.segmentId,
-    //           segmentName: segment.segmentName,
-    //           brandId,
-    //           brandName: brand?.name || 'Unknown Brand',
-    //           skus: skusObject
-    //       };
-    //   });
-    // });
     return ordersList.map(segment => {
       const segmentOrders: { [brandId: string]: { brandName: string; skus: { [skuKey: string]: SelectedOrderData } } } = {};
   
@@ -71,7 +54,7 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({outlet, segmentOrderData,
       return {
         segmentId: segment.segmentId,
         segmentName: segment.segmentName,
-        segmentOrders: segmentOrders,
+        segmentOrders: segmentOrders, // Corrected property name
       };
     });
   };
@@ -145,7 +128,8 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({outlet, segmentOrderData,
             <View style={styles.modalTitleContainer}>
               <Text style={styles.modalTitle}>Confirm Order</Text>
               <Text style={styles.modalTitle}><FontAwesomeIcon icon={faArrowDown} size={25}/></Text>
-              <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/> {outlet}</Text>
+              <Text style={styles.modalTitle}>{beatName}</Text>
+              <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/>  {outlet}</Text>
             </View>
             <FlatList
               data={finalData}
