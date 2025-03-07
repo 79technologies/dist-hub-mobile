@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUserTie, faShop, faBan, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faUserTie } from '@fortawesome/free-solid-svg-icons';
 import { BeatsOutletData } from "@/app/constants/BeatsOutlet";
 import { BeatsOutletSegmentInterface } from '../interface/BeatsOutletSegment';
-import { Brand } from "@/app/interface/BrandSelectionScreen";
-import { SegmentBrandData } from "@/app/constants/SegmentBrand";
 import CustomDropdown from './CustomDropdown';
 import NewBrandsScreen from './NewBrandsScreen';
 
 const BeatsOutletSegment: React.FC = () => {
     const[beatsDropdownData,setBeatsDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
     const[outletDropdownData,setOutletDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
-    const[segmentDropdownData,setSegmentDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
-    const[brandsData, setBrandsData]=useState<Brand[]>([]);
 
     const[selectedBeat,setSelectedBeat] = useState<BeatsOutletSegmentInterface|null>(null);
     const[selectedOutlet,setSelectedOutlet] = useState<BeatsOutletSegmentInterface|null>(null);
-    const[selectedSegment,setSelectedSegment] = useState<BeatsOutletSegmentInterface|null>(null);
 
     // set initial dropdown data
     useEffect(() => {
@@ -26,14 +21,14 @@ const BeatsOutletSegment: React.FC = () => {
                 id: beat.beatId,
                 name: beat.beatName,
             }));
-            const segmentsDropdownData = SegmentBrandData.map((segment) => ({
-                id: segment.segmentId,
-                name: segment.segmentName,
-            }));
             setBeatsDropdownData(beatsDropdownData);
-            setSegmentDropdownData(segmentsDropdownData);
-          }, 1500);
+          }, 150);
     }, []);
+
+    useEffect(() => {
+        setSelectedBeat(beatsDropdownData[0]);
+        setSelectedOutlet({"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"});
+    }, [beatsDropdownData]);
 
     // if selectedBeat changes
     useEffect(() => {
@@ -51,32 +46,23 @@ const BeatsOutletSegment: React.FC = () => {
             setOutletDropdownData(finalOutletDropdownData);
         }
         setSelectedOutlet(null);
-        setBrandsData([]);
     }, [selectedBeat]);
 
-    // set brands data after segment has been selected
-    useEffect(() => {
-        console.log("brandsData\t",brandsData);
-        if(selectedSegment){
-            const finalBrandsData = SegmentBrandData.find((segmentData) => segmentData.segmentId === selectedSegment.id);
-            if (!finalBrandsData) {
-                console.log(`Segment with ID '${selectedSegment}' not found.`);
-            }else{
-                setBrandsData(finalBrandsData.brands);
-            }
-        }
-    }, [selectedSegment]);
+    const handleBrandsCancel = () => {
+        setSelectedOutlet(null);
+        setOutletDropdownData([]);
+        setSelectedBeat(null);
+    }
+
   return (
     <>
-        {brandsData.length>0 ?
+        {selectedOutlet?
             <>
             {/* <Text>okay</Text> */}
                 <NewBrandsScreen
                     selectedBeat={selectedBeat}
                     selectedOutlet={selectedOutlet}
-                    selectedSegment={selectedSegment}
-                    brandsData={brandsData}
-                    setSelectedBeat={setSelectedBeat}
+                    handleBrandsCancel={handleBrandsCancel}
                 />
             </>
             :<>
@@ -98,20 +84,6 @@ const BeatsOutletSegment: React.FC = () => {
                                     dropdownType="Outlet"
                                 />
                             </View>
-                            :<></>
-                        }
-                        {selectedOutlet?
-                            <View style={styles.dropdownContainerActive}>
-                                <CustomDropdown
-                                    setSelectedDropdownProps={setSelectedSegment}
-                                    dropdownData={segmentDropdownData}
-                                    dropdownType="Segment"
-                                />
-                            </View>
-                            :<></>
-                        }
-                        {selectedOutlet?
-                            <Text style={styles.segmentText}>Selecting Segment will redirect to brands Screen.</Text>
                             :<></>
                         }
                     </View>

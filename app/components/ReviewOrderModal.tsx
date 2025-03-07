@@ -2,44 +2,79 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faShop ,faStore, faCircleXmark, faArrowDown, faArrowRight, faWineBottle, faBox } from '@fortawesome/free-solid-svg-icons';
-import { SelectedOrderData, SelectedOrders } from "@/app/interface/Orders";
+import { SelectedOrderData, SelectedOrders, SegmentOrder } from "@/app/interface/Orders";
 import { BrandsData } from "@/app/constants/DummyData";
+import { Brand } from '../interface/BrandSelectionScreen';
 
 type ReviewOrderModal = {
-  ordersList : SelectedOrders;
   outlet : string;
+  segmentOrderData : SegmentOrder[];
+  brandsData : Brand[];
   clearOrdersList : () => void;
   setReviewOrderModalVisibility : (newValue: boolean) => void;
   handleCancelOrder : () => void;
 };
 
 type FinalDataObject = {
-  brandId : string;
-  brandName : string;
-  skus: { [skuKey: string]: SelectedOrderData };
+  segmentId: string;
+  segmentName: string;
+  segmetOrders : {
+    brandId : string;
+    brandName : string;
+    skus: { [skuKey: string]: SelectedOrderData };
+  };
 }
 
-const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, outlet, clearOrdersList, setReviewOrderModalVisibility, handleCancelOrder}) => {
+const ReviewOrderModal: React.FC<ReviewOrderModal> = ({outlet, segmentOrderData, brandsData, clearOrdersList, setReviewOrderModalVisibility, handleCancelOrder}) => {
+  // const [finalData, setFinalData] = useState<SegmentOrder[]>(segmentOrderData);
   const [finalData, setFinalData] = useState<FinalDataObject[]>([]);
   const [orderLoader, setOrderLoader] = useState<boolean>(false);
-  
-  const transformOrdersList = (ordersList : SelectedOrders,) => {
-    return Object.entries(ordersList).map(([brandId, skus]) => {
-      const brand = BrandsData.find((b) => b.id === brandId);
-      // const selectedSkus: SelectedOrderData[] = Object.entries(skus).map(([sku, details]) => ({
-      //     checked: details.checked,
-      //     type: details.type,
-      //     quantity: details.quantity,
-      // }));
 
+  const transformOrdersList = (ordersList: SegmentOrder[]) => {
+    // return ordersList.flatMap(segment => {
+    //   return Object.entries(segment.segmentOrders).map(([brandId, skus]) => {
+    //       const brand = brandsData.find((b) => b.id === brandId);
+    //       const skusObject: { [skuKey: string]: SelectedOrderData } = {};
+
+    //       Object.entries(skus).forEach(([skuKey, skuDetail]) => {
+    //           skusObject[skuKey] = skuDetail;
+    //       });
+
+    //       return {
+    //           segmentId: segment.segmentId,
+    //           segmentName: segment.segmentName,
+    //           brandId,
+    //           brandName: brand?.name || 'Unknown Brand',
+    //           skus: skusObject
+    //       };
+    //   });
+    // });
+    return ordersList.map(segment => {
+      const segmentOrders: { [brandId: string]: { brandName: string; skus: { [skuKey: string]: SelectedOrderData } } } = {};
+  
+      Object.entries(segment.segmentOrders).forEach(([brandId, skus]) => {
+        const brand = brandsData.find((b) => b.id === brandId);
+        if (brand) { // check if brand exists
+          const skusObject: { [skuKey: string]: SelectedOrderData } = {};
+  
+          Object.entries(skus).forEach(([skuKey, skuDetail]) => {
+            skusObject[skuKey] = skuDetail;
+          });
+  
+          segmentOrders[brandId] = {
+            brandName: brand.name,
+            skus: skusObject,
+          };
+        }
+      });
+  
       return {
-          brandId,
-          brandName: brand?.name || 'Unknown Brand',
-          // skus: selectedSkus,
-          skus
+        segmentId: segment.segmentId,
+        segmentName: segment.segmentName,
+        segmentOrders: segmentOrders,
       };
     });
-};
+  };
 
   const handleOrderPunchIn = () => {
     setOrderLoader(true);
@@ -56,74 +91,92 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ordersList, outlet, clear
   }
 
   useEffect(() => {
-    const finalData = transformOrdersList(ordersList);
-    // console.log(finalData);
+    // console.log("$$$$$$$$$%%%%%%%%%%%% brandsData\t",brandsData);
+    const finalData = transformOrdersList(segmentOrderData);
     console.log(JSON.stringify(finalData, null, 2));
-    // console.log(Object.keys(finalData["0"].skus["250ml"]));
     setFinalData(finalData);
-  }, [ordersList]);
+  }, []);
 
-  const renderItem = ({ item }: { item: FinalDataObject }) => {
+  const renderItem = ({ item }: { item: SegmentOrder }) => {
+    console.log(item);
     return (
       <View style={styles.itemContainer}>
-        <Text style={styles.brandName}>{item.brandName}</Text>
-        {Object.entries(item.skus).map(([skuKey, skuDetail]) => (
-            <View key={skuKey} style={styles.skuContainer}>
-              {skuDetail.checked && skuDetail.quantity !== '0' && (
-                <Text style={styles.skuText}>
-                  {skuKey} <FontAwesomeIcon icon={faArrowRight} size={15}/> {skuDetail.quantity} {skuDetail.type === '0' ? <FontAwesomeIcon icon={faBox} size={20}/> : <FontAwesomeIcon icon={faWineBottle} size={20}/>}
-                </Text>
-              )}
-            </View>
-        ))}
-      </View>
-      );
-    };
+            <Text style={styles.brandName}>{item.segmentName}</Text>
+            {item.segmentOrders &&
+                Object.entries(item.segmentOrders).map(([brandId, brandOrders]) => (
+                    brandOrders && (
+                        <View key={brandId} style={styles.skuContainer}>
+                            <Text style={styles.skuText}>{brandOrders.brandName}</Text>
+                            {brandOrders.skus &&
+                                Object.entries(brandOrders.skus).map(([skuKey, skuDetail]) => (
+                                    skuDetail &&
+                                    skuDetail.checked &&
+                                    skuDetail.quantity !== '0' && (
+                                        <View key={skuKey} style={styles.skuContainer}>
+                                            <Text style={styles.skuText}>
+                                                {skuKey}{' '}
+                                                <FontAwesomeIcon icon={faArrowRight} size={15} color="#007AFF" />
+                                                <Text style={styles.skuText}> {skuDetail.quantity} </Text>
+                                                {skuDetail.type === '0' ? (
+                                                    <FontAwesomeIcon icon={faBox} size={20} color="#28A745" />
+                                                ) : (
+                                                    <FontAwesomeIcon icon={faWineBottle} size={20} color="#DC3545" />
+                                                )}
+                                            </Text>
+                                        </View>
+                                    )
+                                ))}
+                        </View>
+                    )
+                ))}
+        </View>
+    );
+  };
 
   return (
     <ScrollView>
-    <Modal
-      animationType="slide"
-      transparent
-      style={styles.container}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalTitleContainer}>
-            <Text style={styles.modalTitle}>Confirm Order</Text>
-            <Text style={styles.modalTitle}><FontAwesomeIcon icon={faArrowDown} size={25}/></Text>
-            <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/> {outlet}</Text>
+      <Modal
+        animationType="slide"
+        transparent
+        style={styles.container}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalTitleContainer}>
+              <Text style={styles.modalTitle}>Confirm Order</Text>
+              <Text style={styles.modalTitle}><FontAwesomeIcon icon={faArrowDown} size={25}/></Text>
+              <Text style={styles.modalTitle}><FontAwesomeIcon icon={faShop} size={25}/> {outlet}</Text>
+            </View>
+            <FlatList
+              data={finalData}
+              // keyExtractor={(item) => item.segmentId}
+              renderItem={renderItem}
+              style={{ flexGrow: 1 }}
+            />
+            {orderLoader?
+              <View style={styles.loaderWrapper}>
+                <Text>Order Punching in Progress</Text>
+                <ActivityIndicator size="large" color="#0000ff" />
+              </View>
+              :
+              <View style={styles.buttonsContainer}>
+                <TouchableOpacity
+                    style={[styles.submitButton, styles.modalButton]}
+                    onPress={handleOrderPunchIn}
+                >
+                    <Text style={styles.buttonText}>Order <FontAwesomeIcon icon={faStore} style={styles.buttonIcons}/></Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[styles.closeButton, styles.modalButton]}
+                    onPress={closeModal}
+                >
+                    <Text style={styles.buttonText}>Cancel <FontAwesomeIcon icon={faCircleXmark} style={styles.buttonIcons}/></Text>
+                </TouchableOpacity>
+              </View>
+            }
           </View>
-          <FlatList
-            data={finalData}
-            keyExtractor={(item) => item.brandId}
-            renderItem={renderItem}
-            style={{ flexGrow: 1 }}
-          />
-          {orderLoader?
-            <View style={styles.loaderWrapper}>
-              <Text>Order Punching in Progress</Text>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-            :
-            <View style={styles.buttonsContainer}>
-              <TouchableOpacity
-                  style={[styles.submitButton, styles.modalButton]}
-                  onPress={handleOrderPunchIn}
-              >
-                  <Text style={styles.buttonText}>Order <FontAwesomeIcon icon={faStore} style={styles.buttonIcons}/></Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                  style={[styles.closeButton, styles.modalButton]}
-                  onPress={closeModal}
-              >
-                  <Text style={styles.buttonText}>Cancel <FontAwesomeIcon icon={faCircleXmark} style={styles.buttonIcons}/></Text>
-              </TouchableOpacity>
-            </View>
-          }
         </View>
-      </View>
-    </Modal>
+      </Modal>
     </ScrollView>
   );
 };
@@ -183,7 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   input: {
-    height: 40,
+    // height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,

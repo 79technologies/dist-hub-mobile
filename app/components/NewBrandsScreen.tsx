@@ -6,36 +6,71 @@ import { faUserTie, faShop, faBan, faSearch } from '@fortawesome/free-solid-svg-
 import Toast from 'react-native-toast-message';
 import { Brand } from "@/app/interface/BrandSelectionScreen";
 import { BeatsOutletSegmentInterface } from '../interface/BeatsOutletSegment';
-import { SelectedOrders } from "@/app/interface/Orders";
-import { BrandsData, OutletData } from "@/app/constants/DummyData";
+import { SelectedOrders, SegmentOrder } from "@/app/interface/Orders";
+import { SegmentBrandData } from "@/app/constants/SegmentBrand";
 import SKUModal from './SKUModal';
 import ReviewOrderModal from '@/app/components/ReviewOrderModal';
-
-type Outlet = {
-  id: string;
-  label: string;
-};
+import CustomDropdown from './CustomDropdown';
 
 type NewBrandsScreenProps = {
     selectedBeat : BeatsOutletSegmentInterface | null;
     selectedOutlet : BeatsOutletSegmentInterface | null;
-    selectedSegment : BeatsOutletSegmentInterface | null;
-    brandsData : Brand[];
-    setSelectedBeat : (newValue: BeatsOutletSegmentInterface | null) => void;
+    handleBrandsCancel : () => void;
 };
 
-const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selectedOutlet, selectedSegment, brandsData, setSelectedBeat}) => {
-//   const [outlet, setOutlet] = useState<Outlet>({ id: '', label: '' });
+const newSelectedBeat = {"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"}
+const newSelectedOutlet = {"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"}
+
+// const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selectedOutlet, handleBrandsCancel}) => {
+const NewBrandsScreen : React.FC = () => {
 
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [reviewOrderModalVisibility, setReviewOrderModalVisibility] = useState(false);
   const [ordersList, setOrdersList] = useState<SelectedOrders>({});
 
-  const handleOrdersUpdate = (brandId: string, updatedSkus: SelectedOrders) => {
-    console.log("brands selction screen, data passed as below");
-    console.log("brandId => ",brandId,"\Updated datd -> ", updatedSkus);
+  const[brandsData, setBrandsData]=useState<Brand[]>([]);
+  const[selectedSegment,setSelectedSegment] = useState<BeatsOutletSegmentInterface|null>(null);
+  const[segmentDropdownData,setSegmentDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
+  const[segmentOrderData,setSegmentOrderData]=useState<SegmentOrder[]>([]);
 
+  // const handleOrdersUpdate = (brandId: string, updatedSkus: SelectedOrders) => {
+  //   console.log("brands selction screen, data passed as below");
+  //   console.log("brandId => ",brandId,"\Updated datd -> ", updatedSkus);
+
+  //   if(Object.keys(ordersList).length === 0){
+  //     setOrdersList({[brandId] : updatedSkus});
+  //   }else{
+  //     setOrdersList((prevOrders) => {
+  //       console.log("prevOrders\t",prevOrders);
+  //       let updatedOrders = { ...prevOrders };
+  //       console.log(updatedOrders[brandId]);
+  //       updatedOrders[brandId] = updatedSkus
+  //       return updatedOrders;
+  //     });
+  //   }
+  // };
+
+  const handleOrdersUpdate = (brandId: string, updatedSkus: SelectedOrders) => {
+    console.log("brands selection screen, data passed as below");
+    console.log("segmentId => ", selectedSegment?.id, "brandId => ", brandId, "\Updated data -> ", updatedSkus);
+
+    setSegmentOrderData((prevSegments) => {
+        return prevSegments.map((segment) => {
+            if (segment.segmentId === selectedSegment?.id) {
+                // Update the segmentOrders within the matching segment
+                return {
+                    ...segment,
+                    segmentOrders: {
+                        ...segment.segmentOrders,
+                        [brandId]: updatedSkus,
+                    },
+                };
+            }
+            return segment; // Return unchanged segment
+        });
+    });
+    // setOrdersList();
     if(Object.keys(ordersList).length === 0){
       setOrdersList({[brandId] : updatedSkus});
     }else{
@@ -60,35 +95,145 @@ const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selecte
   };
 
   const handleCancelOrder = () => {
-    // if (!ordersList.hasOwnProperty(brandId)) return false;
-    //   const skus = ordersList[brandId];
-    //   return Object.values(skus).some((sku:any) => sku.checked === true);
-    // setOutlet({ id: '', label: '' });
     setSelectedBrand(null);
     setModalVisibility(false);
     setReviewOrderModalVisibility(false);
     setOrdersList({});
-    setSelectedBeat('');
+    // handleBrandsCancel();
     console.log("cancel order clicked");
   };
 
-  // testing code start
   useEffect(() => {
-    // setSelectedBrand(BrandsData[4]);
-    console.log("BrandSelectionScreen useEffect ordersList\t",ordersList);
+    const segmentsDropdownData = SegmentBrandData.map((segment) => ({
+        id: segment.segmentId,
+        name: segment.segmentName,
+    }));
+    setSegmentDropdownData(segmentsDropdownData);
+
     Toast.show({
       type: 'success',
       text1: 'Hello',
       text2: 'This is some something 👋'
     });
+  }, []);
+
+  useEffect(() => {
+    // console.log("", segmentOrderData);
+    console.log("%%%%%%%%%%%%% segmentOrderData changed\t",JSON.stringify(segmentOrderData, null, 2));
+  }, [segmentOrderData]);
+
+  useEffect(() => {
+    console.log("useEffect ordersList\t",ordersList);
   }, [ordersList]);
-  // testing code end
+
+  // set brands data after segment has been selected
+  // set segmentOrderData as well
+  // useEffect(() => {
+  //   if(selectedSegment){
+  //     const finalBrandsData = SegmentBrandData.find((segmentData) => segmentData.segmentId === selectedSegment.id);
+  //     if (!finalBrandsData) {
+  //       console.log(`Segment with ID '${selectedSegment}' not found.`);
+  //     }else{
+  //       setBrandsData(finalBrandsData.brands);
+
+  //       setSegmentOrderData((prevSegments) => {
+  //         const segmentExists = prevSegments.some(seg => seg.segmentId === selectedSegment.id);
+  //         if (segmentExists) {
+  //           return prevSegments.map(seg =>
+  //             seg.segmentId === selectedSegment.id
+  //               ? { ...seg, segmentOrders: ordersList }
+  //               : seg
+  //           );
+  //         } else {
+  //           return [...prevSegments, {
+  //             segmentId: selectedSegment.id,
+  //             segmentName: selectedSegment.name,
+  //             segmentOrders: ordersList,
+  //           }];
+  //         }
+  //       });
+
+
+  //       // console.log("############ segmentOrderData\t",segmentOrderData);
+  //       // const currSegmentState = segmentOrderData;
+        
+  //       // let segmentFound : any = null;
+  //       // currSegmentState.forEach(segment => {
+  //       //     if(segment.segmentId === selectedSegment.id){
+  //       //       console.log("$$$$$ segment\t",segment);
+  //       //       segmentFound = segment;
+  //       //     }
+  //       //   });
+          
+  //       //   if(segmentFound){
+  //       //     console.log("segmentFound/t",segmentFound);
+  //       //     setSegmentOrderData((currSegmentState) => ({
+  //       //       ...currSegmentState,
+  //       //       [segmentId]: {
+  //       //         segmentId : selectedSegment.id,
+  //       //         segmentName : selectedSegment.name,
+  //       //         segmentOrders : ordersList
+  //       //       },
+  //       //     }));
+  //       //   }else{
+  //       //     let temp = segmentOrderData;
+  //       //     temp.push({
+  //       //       segmentId : selectedSegment.id,
+  //       //       segmentName : selectedSegment.name,
+  //       //       segmentOrders : {}
+  //       //     });
+  //       //     setSegmentOrderData(temp);
+  //       //   }
+  //       // }
+  //     }
+  //   }
+  // }, [selectedSegment, ordersList]);
+
+  useEffect(() => {
+    if (selectedSegment) {
+        const finalBrandsData = SegmentBrandData.find((segmentData) => segmentData.segmentId === selectedSegment.id);
+        if (!finalBrandsData) {
+            console.log(`Segment with ID '${selectedSegment.id}' not found.`);
+            setBrandsData([]);
+        } else {
+            setBrandsData(finalBrandsData.brands);
+            setSegmentOrderData((prevSegments) => {
+                const segmentIndex = prevSegments.findIndex(seg => seg.segmentId === selectedSegment.id);
+
+                if (segmentIndex === -1) {
+                    // Segment does not exist, add it
+                    return [...prevSegments, {
+                        segmentId: selectedSegment.id,
+                        segmentName: selectedSegment.name,
+                        segmentOrders: {}, // Initialize with empty segmentOrders
+                    }];
+                } else {
+                    return prevSegments; // If segment exists, do not update
+                }
+            });
+        }
+    } else {
+        setBrandsData([]);
+    }
+  }, [selectedSegment]);
+
 
   return (
     <View style={styles.container}>
         <View style={styles.outletNameContainer}>
-            <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{selectedSegment?.name}</Text>
+            <FontAwesomeIcon icon={faShop} size={32} style={styles.outletName}/><Text style={styles.outletName}>{newSelectedOutlet?.name}</Text>
         </View>
+        {/* {selectedOutlet? */}
+        {newSelectedOutlet?
+          <View style={styles.dropdownContainerActive}>
+            <CustomDropdown
+              setSelectedDropdownProps={setSelectedSegment}
+              dropdownData={segmentDropdownData}
+              dropdownType="Segment"
+            />
+          </View>
+          :<></>
+        }
         <FlatList
             style={styles.brandContainer}
             data={brandsData}
@@ -150,7 +295,14 @@ const NewBrandsScreen : React.FC<NewBrandsScreenProps> = ({selectedBeat, selecte
             
         {/* </View> */}
         { reviewOrderModalVisibility ?
-            <ReviewOrderModal ordersList={ordersList} outlet={selectedOutlet?.name} clearOrdersList={clearOrdersList} setReviewOrderModalVisibility={setReviewOrderModalVisibility} handleCancelOrder={handleCancelOrder}/> :
+            <ReviewOrderModal
+              segmentOrderData={segmentOrderData}
+              // outlet={selectedOutlet?.name}
+              outlet={newSelectedOutlet?.name}
+              brandsData={brandsData}
+              clearOrdersList={clearOrdersList}
+              setReviewOrderModalVisibility={setReviewOrderModalVisibility}
+              handleCancelOrder={handleCancelOrder}/> :
             <></>
         }
     </View>
@@ -172,6 +324,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // maxHeight: '80%', // Limit modal height
     backgroundColor : "#3B0B61",
+  },
+  dropdownContainerActive : {
+    width : '100%',
+    height:200,
+    // position:'relative',
+    // top:100
   },
   dropdownText:{
     // marginBottom:100,

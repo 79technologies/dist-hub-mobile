@@ -59,7 +59,7 @@ const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownTy
                 data={dropdownData}
                 search
                 // minHeight={500}
-                maxHeight={500}
+                // maxHeight={500}
                 labelField="name"
                 valueField="id"
                 placeholder={`Select ${dropdownType}`}

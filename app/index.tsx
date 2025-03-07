@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import LoginForm from './LoginForm';
 import BrandSelectionScreen from './components/BrandSelectionScreen';
 import BeatsOutletSegment from './components/BeatsOutletSegment';
+import NewBrandsScreen from "./components/NewBrandsScreen";
 
 export default function Index() {
   const [loginStatus, setLoginStatus] = useState<boolean>(true);
@@ -27,7 +28,7 @@ export default function Index() {
       <View style={{flex: 1, justifyContent: "center"}}>
         <StatusBar style="dark" />
         {loginStatus ? 
-          <BeatsOutletSegment />
+          <NewBrandsScreen />
           : <LoginForm onLoginChange={handleLoginStatusChange} showToast={showToast}/>
         }
         {/* {loginStatus ? 
