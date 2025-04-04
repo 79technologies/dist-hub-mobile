@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faShop, faStore, faCircleXmark, faArrowDown, faArrowRight, faWineBottle, faBox } from '@fortawesome/free-solid-svg-icons';
 import { SelectedOrderData, SelectedOrders, SegmentOrder } from "@/app/interface/Orders";
 import { BrandsData } from "@/app/constants/DummyData";
+import { SegmentBrandData } from '../constants/SegmentBrand';
 import { Brand } from '../interface/BrandSelectionScreen';
 import { FinalOrderContext } from '@/app/contexts/FinalOrderContext';
 
@@ -34,30 +35,39 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ beatName, outlet, segmen
 
   const { finalOrderData, setFinalOrderData } = useContext(FinalOrderContext);
 
+  const getBrandsDataFromSegmentId = (segmentId: string) => {
+    let currentBrandsData: any;
+    for (const [index, SegmentData] of Object.entries(SegmentBrandData)) {
+      if (SegmentData.segmentId == segmentId) {
+        currentBrandsData = SegmentData.brands;
+        break;
+      }
+    }
+    return currentBrandsData;
+  }
+
   const transformOrdersList = (ordersList: SegmentOrder[]) => {
     return ordersList.map(segment => {
       const segmentOrders: { [brandId: string]: { brandName: string; skus: { [skuKey: string]: SelectedOrderData } } } = {};
 
       Object.entries(segment.segmentOrders).forEach(([brandId, skus]) => {
-        const brand = brandsData.find((b) => b.id === brandId);
+        const brandsDataNew = getBrandsDataFromSegmentId(segment.segmentId);
+        const brand = brandsDataNew.find((b) => b.id === brandId);
         if (brand) { // check if brand exists
           const skusObject: { [skuKey: string]: SelectedOrderData } = {};
-
           Object.entries(skus).forEach(([skuKey, skuDetail]) => {
             skusObject[skuKey] = skuDetail;
           });
-
           segmentOrders[brandId] = {
             brandName: brand.name,
             skus: skusObject,
           };
         }
       });
-
       return {
         segmentId: segment.segmentId,
         segmentName: segment.segmentName,
-        segmentOrders: segmentOrders, // Corrected property name
+        segmentOrders: segmentOrders,
       };
     });
   };
@@ -77,15 +87,11 @@ const ReviewOrderModal: React.FC<ReviewOrderModal> = ({ beatName, outlet, segmen
   }
 
   useEffect(() => {
-    // console.log("$$$$$$$$$%%%%%%%%%%%% brandsData\t",brandsData);
-    console.log("$$$$$$$$$ finalOrderData $$$$$$$$$$$$$$\n", finalOrderData);
     const finalData = transformOrdersList(segmentOrderData);
-    console.log(JSON.stringify(finalData, null, 2));
     setFinalData(finalData);
   }, []);
 
   const renderItem = ({ item }: { item: SegmentOrder }) => {
-    console.log(item);
     return (
       <View style={styles.itemContainer}>
         <Text style={styles.brandName}>{item.segmentName}</Text>

@@ -301,9 +301,11 @@ const NewBrandsScreen: React.FC<NewBrandsScreenProps> = ({ selectedBeat, selecte
           // outlet={selectedOutlet?.name}
           outlet={selectedOutlet?.name}
           brandsData={brandsData}
+          // brandsData={finalBrandsData.brands}
           clearOrdersList={clearOrdersList}
           setReviewOrderModalVisibility={setReviewOrderModalVisibility}
-          handleCancelOrder={handleCancelOrder} /> :
+          handleCancelOrder={handleCancelOrder}
+        /> :
         <></>
       }
     </View>
