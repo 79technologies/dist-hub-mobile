@@ -5,12 +5,14 @@ import ToastProvider from 'react-native-toast-message';
 import { StatusBar } from 'expo-status-bar';
 import LoginForm from './LoginForm';
 import BrandSelectionScreen from './components/BrandSelectionScreen';
-// import BeatsOutletSegment from './components/BeatsOutletSegment';
+import BeatsOutletSegment from './components/BeatsOutletSegment';
+import NewBrandsScreen from "./components/NewBrandsScreen";
 
 export default function Index() {
   const [loginStatus, setLoginStatus] = useState<boolean>(false);
+  // const [loginStatus, setLoginStatus] = useState<boolean>(true);
 
-  const handleLoginStatusChange = (newValue:boolean) => {
+  const handleLoginStatusChange = (newValue: boolean) => {
     setLoginStatus(newValue);
   };
 
@@ -24,17 +26,17 @@ export default function Index() {
 
   return (
     // <ToastProvider>
-      <View style={{flex: 1, justifyContent: "center"}}>
-        <StatusBar style="dark" />
-        {/* {loginStatus ? 
-          <BeatsOutletSegment />
-          : <LoginForm onLoginChange={handleLoginStatusChange} showToast={showToast}/>
-        } */}
-        {loginStatus ? 
+    <View style={{ flex: 1, justifyContent: "center" }}>
+      <StatusBar style="dark" />
+      {loginStatus ?
+        <BeatsOutletSegment />
+        : <LoginForm onLoginChange={handleLoginStatusChange} showToast={showToast} />
+      }
+      {/* {loginStatus ? 
           <BrandSelectionScreen />
           : <LoginForm onLoginChange={handleLoginStatusChange} showToast={showToast}/>
-        }
-      </View>
+        } */}
+    </View>
     // </ToastProvider>
   );
 }

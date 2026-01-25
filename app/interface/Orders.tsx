@@ -7,3 +7,9 @@ export interface SelectedOrderData {
 export interface SelectedOrders {
   [key: string]: SelectedOrderData;
 }
+
+export interface SegmentOrder {
+  segmentId : string,
+  segmentName : string,
+  segmentOrders: SelectedOrders;
+}

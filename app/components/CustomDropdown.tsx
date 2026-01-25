@@ -8,7 +8,7 @@ import { BeatsOutletSegmentInterface, Beats, Outlet, Segment } from '../interfac
 type CustomDropdownProps = {
     dropdownData : BeatsOutletSegmentInterface[];
     dropdownType : string;
-    setSelectedDropdownProps : (newValue : string) => void;
+    setSelectedDropdownProps : (newValue : BeatsOutletSegmentInterface | null) => void;
 };
 
 const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownType, setSelectedDropdownProps }) => {
@@ -17,12 +17,13 @@ const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownTy
     const [filteredData, setFilteredData] = useState<string[]|[]>([]);
 
     const handleDropdownChange = (outletId:string, outletLabel:string) => {
-        setSelectedDropdownData({
-            id : outletId,
-            name : outletLabel
-        });
-        setSelectedDropdownProps(outletId);
-        console.log(outletId, outletLabel);
+      const finalData = {
+        id : outletId,
+        name : outletLabel
+      };
+        setSelectedDropdownData(finalData);
+        setSelectedDropdownProps(finalData);
+        // console.log(outletId, outletLabel);
     }
 
     const handleOutletSearch = (text:string) => {
@@ -50,7 +51,7 @@ const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownTy
 
     return (
         <View style={styles.dropdownContainer}>
-            <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons}/></Text>
+            {/* <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons}/></Text> */}
             <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -58,7 +59,7 @@ const CustomDropdown:React.FC<CustomDropdownProps> = ({ dropdownData, dropdownTy
                 data={dropdownData}
                 search
                 // minHeight={500}
-                maxHeight={500}
+                // maxHeight={500}
                 labelField="name"
                 valueField="id"
                 placeholder={`Select ${dropdownType}`}
@@ -77,11 +78,11 @@ const styles = StyleSheet.create({
     dropdownContainer:{
         flex: 1,
         padding: 20,
-        justifyContent: 'center',
+        // justifyContent: 'center',
         alignItems: 'center',
         // maxHeight: '80%', // Limit modal height
-        borderColor:'red',
-        borderWidth:2,
+        // borderColor:'red',
+        // borderWidth:2,
         width:"100%"
       },
       dropdownText:{

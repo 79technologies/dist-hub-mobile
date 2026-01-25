@@ -17,6 +17,25 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
+# Android
+android/build/
+android/.gradle/
+android/app/build/
+android/app/src/main/assets/
+android/app/src/main/res/raw/
+android/app/src/main/res/drawable-*/
+android/local.properties
+
+# iOS
+ios/build/
+ios/Pods/
+ios/.xcode.env.local
+ios/*.xcworkspace/
+ios/*.xcodeproj/project.xcworkspace/
+ios/*.xcodeproj/xcuserdata/
+ios/DerivedData/
+ios/IPAs/
+
 # Metro
 .metro-health-check*
 
@@ -29,10 +48,17 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# IDEs
+.idea/
+.vscode/
+
 # local env files
-.env*.local
+.env
+.env.local
+.env.*.local
 
 # typescript
 *.tsbuildinfo
 
-app-example
+# test
+coverage/

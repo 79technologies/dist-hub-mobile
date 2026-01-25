@@ -1,140 +1,135 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { BeatsData } from "@/app/constants/DummyData";
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faUserTie } from '@fortawesome/free-solid-svg-icons';
+import { BeatsOutletData } from "@/app/constants/BeatsOutlet";
 import { BeatsOutletSegmentInterface } from '../interface/BeatsOutletSegment';
 import CustomDropdown from './CustomDropdown';
+import NewBrandsScreen from './NewBrandsScreen';
+import { FinalOrderContext } from '@/app/contexts/FinalOrderContext';
 
 const BeatsOutletSegment: React.FC = () => {
-    const[beatsDropdownData,setBeatsDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
-    const[outletDropdownData,setOutletDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
-    const[segmentDropdownData,setSegmentDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
+    const [beatsDropdownData, setBeatsDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
+    const [outletDropdownData, setOutletDropdownData] = useState<BeatsOutletSegmentInterface[]>([]);
 
-    const[selectedBeat,setSelectedBeat] = useState<string>('');
-    const[selectedOutlet,setSelectedOutlet] = useState<string>('');
-    const[selectedSegment,setSelectedSegment] = useState<string>('');
+    const [selectedBeat, setSelectedBeat] = useState<BeatsOutletSegmentInterface | null>(null);
+    const [selectedOutlet, setSelectedOutlet] = useState<BeatsOutletSegmentInterface | null>(null);
 
-    const getBeatsDropdownData = () => {
-        return BeatsData.map((beat) => ({
-            id: beat.beatId,
-            name: beat.beatName,
-        }));
-    }
+    const [finalOrderData, setFinalOrderData] = useState({});
 
     // set initial dropdown data
     useEffect(() => {
         setTimeout(() => {
-            const beatsDropdownData = getBeatsDropdownData();
+            const beatsDropdownData = BeatsOutletData.map((beat) => ({
+                id: beat.beatId,
+                name: beat.beatName,
+            }));
             setBeatsDropdownData(beatsDropdownData);
-          }, 1500);
+        }, 150);
     }, []);
+
+    // useEffect(() => {
+    //     setSelectedBeat(beatsDropdownData[0]);
+    //     setSelectedOutlet({"id": "outlet_654", "name": "Ashirwad Family Bar & Rest  Balli"});
+    // }, [beatsDropdownData]);
 
     // if selectedBeat changes
     useEffect(() => {
         // set appropriate outletDropdownData and selectedOutlet
-        const foundBeat = BeatsData.find((beat) => beat.beatId === selectedBeat);
-      
+        const foundBeat = BeatsOutletData.find((beat) => beat.beatId === selectedBeat?.id);
+
         if (!foundBeat) {
             console.log(`Beat with ID '${selectedBeat}' not found.`);
             setOutletDropdownData([]);
-            setSelectedOutlet('');
-        }else{
+        } else {
             const finalOutletDropdownData = foundBeat.outlets.map((outlet) => ({
                 id: outlet.outletId,
                 name: outlet.outletName,
             }));
             setOutletDropdownData(finalOutletDropdownData);
-            setSelectedOutlet('');
         }
-
-        // reset segmentDropdownData & selectedSegment
-        setSegmentDropdownData([]);
-        setSelectedSegment('');
+        setSelectedOutlet(null);
     }, [selectedBeat]);
 
-    // if selectedOutlet changes
-    useEffect(() => {
-        // set appropriate segmentDropdownData
-        const foundBeat : any = BeatsData.find((beat) => beat.beatId === selectedBeat);
-        if (!foundBeat) {
-            console.log("Beat not found.");
-        }else{
-            const foundOutlet : any = foundBeat.outlets.find((outlet) => outlet.outletId === selectedOutlet);
-            console.log("foundOutlet/t",foundOutlet);
-            if (!foundOutlet) {
-                console.log("Outlet not found in the specified beat.");
-            }else{
-                const finalSegmentDropdownData : any = foundOutlet.segments.map((segment:any) => ({
-                    id: segment.segmentId,
-                    name: segment.segmentName,
-                }));
-                console.log("finalSegmentDropdownData\t",finalSegmentDropdownData);
-                setSegmentDropdownData(finalSegmentDropdownData);
-                setSelectedSegment('');
-            }
-        }
+    const handleBrandsCancel = () => {
+        setSelectedOutlet(null);
+        setOutletDropdownData([]);
+        setSelectedBeat(null);
+    }
 
-    }, [selectedOutlet]);
-
-    // set segment dropdown data after outlet has been selected
-    useEffect(() => {
-
-    }, [segmentDropdownData]);
-  return (
-    <View style={styles.container}>
-        {beatsDropdownData.length>0 ? (
-            <>
-                <CustomDropdown
-                    setSelectedDropdownProps={setSelectedBeat}
-                    dropdownData={beatsDropdownData}
-                    dropdownType="Beat"
+    return (
+        <FinalOrderContext.Provider value={{ finalOrderData, setFinalOrderData }}>
+            {selectedOutlet != null ?
+                <NewBrandsScreen
+                    selectedBeat={selectedBeat}
+                    selectedOutlet={selectedOutlet}
+                    handleBrandsCancel={handleBrandsCancel}
                 />
-                {outletDropdownData.length>0?
-                    <CustomDropdown
-                        setSelectedDropdownProps={setSelectedOutlet}
-                        dropdownData={outletDropdownData}
-                        dropdownType="Outlet"
-                    />
-                    :<></>
-                }
-                {segmentDropdownData.length>0?
-                    <CustomDropdown
-                        setSelectedDropdownProps={setSelectedSegment}
-                        dropdownData={segmentDropdownData}
-                        dropdownType="Segment"
-                    />
-                    :<></>
-                }
-                {selectedBeat !== '' && selectedOutlet !== ''  && selectedSegment !== '' ?
-                    <>
-                        <Text>GTG</Text>
-                    </>
-                    :<></>
-                }
-            </>
-        ) : (
-            <>
-                <ActivityIndicator size="large" color="#0000ff" />
-                <Text style={styles.loadingText}>Fetching Beats Data</Text>
-            </>
-        )}
-                {/* <Text style={styles.loadingText}>Fetching Beats Data</Text> */}
-
-    </View>
-  );
+                : <>
+                    {beatsDropdownData.length > 0 ? (
+                        <View style={styles.container}>
+                            <Text style={styles.dropdownText}>Welcome Aboard! <FontAwesomeIcon icon={faUserTie} size={25} style={styles.buttonIcons} /></Text>
+                            <View style={styles.dropdownContainerActive}>
+                                <CustomDropdown
+                                    setSelectedDropdownProps={setSelectedBeat}
+                                    dropdownData={beatsDropdownData}
+                                    dropdownType="Beat"
+                                />
+                            </View>
+                            {outletDropdownData.length > 0 ?
+                                <View style={styles.dropdownContainerActive}>
+                                    <CustomDropdown
+                                        setSelectedDropdownProps={setSelectedOutlet}
+                                        dropdownData={outletDropdownData}
+                                        dropdownType="Outlet"
+                                    />
+                                </View>
+                                : <></>
+                            }
+                        </View>
+                    ) : (
+                        <>
+                            <ActivityIndicator size="large" color="#0000ff" />
+                            <Text style={styles.loadingText}>Fetching Beats Data</Text>
+                        </>
+                    )}
+                </>
+            }
+        </FinalOrderContext.Provider>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    // padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // maxHeight: '80%', // Limit modal height
-    backgroundColor : "#3B0B61",
-  },
-  loadingText : {
-    color : "#ffffff"
-  }
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#3B0B61",
+    },
+    dropdownContainerActive: {
+        width: '100%',
+        height: 200,
+        // position:'relative',
+        // top:100
+    },
+    segmentText: {
+        color: "#ffffff",
+        // flex: 1,
+        // justifyContent: 'center',
+        // alignItems: 'center',
+    },
+    dropdownText: {
+        // marginBottom:100,
+        color: "#FFFFFF",
+        fontSize: 25,
+        height: 50
+    },
+    buttonIcons: {
+        color: "#ffffff",
+    },
+    loadingText: {
+        color: "#ffffff"
+    }
 });
 
 export default BeatsOutletSegment;
