@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    width: 'auto',
+    width: '80%',
+    height: 80,
     marginBottom: 50,
     resizeMode: 'contain',
   },
