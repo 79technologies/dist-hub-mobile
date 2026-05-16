@@ -1,4 +1,4 @@
-package com.madhusudansinghrathore.MsrCrud
+package com.madhusudansinghrathore.disthubmobile
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

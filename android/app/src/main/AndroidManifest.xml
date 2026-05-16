@@ -25,8 +25,8 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
-        <data android:scheme="com.madhusudansinghrathore.MsrCrud"/>
-        <data android:scheme="exp+msrcrud"/>
+        <data android:scheme="com.madhusudansinghrathore.disthubmobile"/>
+        <data android:scheme="exp+dist-hub-mobile"/>
       </intent-filter>
     </activity>
   </application>

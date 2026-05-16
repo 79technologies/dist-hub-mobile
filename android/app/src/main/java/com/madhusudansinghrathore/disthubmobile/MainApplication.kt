@@ -1,4 +1,4 @@
-package com.madhusudansinghrathore.MsrCrud
+package com.madhusudansinghrathore.disthubmobile
 
 import android.app.Application
 import android.content.res.Configuration

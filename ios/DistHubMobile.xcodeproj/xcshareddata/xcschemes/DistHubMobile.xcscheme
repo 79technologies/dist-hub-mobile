@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "MsrCrud.app"
-               BlueprintName = "MsrCrud"
-               ReferencedContainer = "container:MsrCrud.xcodeproj">
+               BuildableName = "DistHubMobile.app"
+               BlueprintName = "DistHubMobile"
+               ReferencedContainer = "container:DistHubMobile.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MsrCrudTests.xctest"
-               BlueprintName = "MsrCrudTests"
-               ReferencedContainer = "container:MsrCrud.xcodeproj">
+               BuildableName = "DistHubMobileTests.xctest"
+               BlueprintName = "DistHubMobileTests"
+               ReferencedContainer = "container:DistHubMobile.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MsrCrud.app"
-            BlueprintName = "MsrCrud"
-            ReferencedContainer = "container:MsrCrud.xcodeproj">
+            BuildableName = "DistHubMobile.app"
+            BlueprintName = "DistHubMobile"
+            ReferencedContainer = "container:DistHubMobile.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MsrCrud.app"
-            BlueprintName = "MsrCrud"
-            ReferencedContainer = "container:MsrCrud.xcodeproj">
+            BuildableName = "DistHubMobile.app"
+            BlueprintName = "DistHubMobile"
+            ReferencedContainer = "container:DistHubMobile.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

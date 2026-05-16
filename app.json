@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MsrCrud",
-    "slug": "MsrCrud",
+    "name": "Dist Hub Mobile",
+    "slug": "dist-hub-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.madhusudansinghrathore.MsrCrud"
+      "bundleIdentifier": "com.madhusudansinghrathore.disthubmobile"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.madhusudansinghrathore.MsrCrud"
+      "package": "com.madhusudansinghrathore.disthubmobile"
     },
     "web": {
       "bundler": "metro",
@@ -34,7 +34,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true

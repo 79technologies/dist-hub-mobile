@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.madhusudansinghrathore.MsrCrud'
+    namespace 'com.madhusudansinghrathore.disthubmobile'
     defaultConfig {
-        applicationId 'com.madhusudansinghrathore.MsrCrud'
+        applicationId 'com.madhusudansinghrathore.disthubmobile'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

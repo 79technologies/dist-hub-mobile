@@ -1,5 +1,5 @@
 {
-  "name": "msrcrud",
+  "name": "dist-hub-mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -31,7 +31,8 @@
     "react-native-toast-message": "^2.2.1",
     "react-native-web": "~0.19.13",
     "react-native-webview": "13.12.5",
-    "expo-dev-client": "~5.0.20"
+    "expo-dev-client": "~5.0.20",
+    "expo-sqlite": "~15.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
